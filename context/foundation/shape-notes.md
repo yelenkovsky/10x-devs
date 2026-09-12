@@ -23,16 +23,16 @@ checkpoint:
     - topic: "triggering moment"
       decision: "Right after meeting new words (article, class, conversation), when they want cards before they forget."
     - topic: "auth strategy"
-      decision: "Email + password login. Flat accounts: each user owns only their own flashcards. No admin/member/guest. Unauthenticated visitors do not get a saved deck. Passwordless was considered in Socrates and dropped for MVP."
+      decision: "Email + password sign-up and login. Flat accounts: each user owns only their own flashcards. No admin/member/guest. Unauthenticated visitors do not get a saved deck. Passwordless was considered in Socrates and dropped for MVP."
     - topic: "mvp first session"
-      decision: "Open app → email+password sign-in → paste word list or short text → AI cloze cards (word/phrase, full sentence, definition, collocation/pattern, Polish translation) → accept/edit/delete (and manual create) → ready-made SRS review."
+      decision: "Open app → create account and email+password sign-in → paste word list or short text → AI cloze cards (word/phrase, full sentence, definition, collocation/pattern, Polish translation) → accept/edit/delete (and manual create) → ready-made SRS review."
     - topic: "timeline"
       decision: "User committed to sustained-effort cost for this integration-heavy flow, then recorded mvp_weeks: 3. No hard deadline. After-hours only."
     - topic: "product framing"
       decision: "Web app. Target scale: just the builder or a handful (small). Typical-use rule does not change at 100×."
     - topic: "non-goals"
       decision: "No custom SRS; no PDF/DOCX import; no deck sharing; no RemNote/Anki integrations; no mobile; no pronunciation/AI conversation; no passwordless login."
-  frs_drafted: 9
+  frs_drafted: 10
   quality_check_status: accepted
 ---
 
@@ -57,7 +57,7 @@ The insight the status quo misses: card quality is typical use, not impressive s
 ## Success Criteria
 
 ### Primary
-- A new self-learner can complete the first session: open the app, sign in with email and password, paste a word list or short text, receive AI-generated cloze cards (word/phrase, full sentence, short definition, collocation/pattern, Polish translation), accept/edit/delete (or create a card by hand), and review those cards with a ready-made SRS algorithm.
+- A new self-learner can complete the first session: open the app, create an account and sign in with email and password, paste a word list or short text, receive AI-generated cloze cards (word/phrase, full sentence, short definition, collocation/pattern, Polish translation), accept/edit/delete (or create a card by hand), and review those cards with a ready-made SRS algorithm.
 
 ### Secondary
 - 75% of AI-generated flashcards are accepted by the user.
@@ -82,11 +82,23 @@ The insight the status quo misses: card quality is typical use, not impressive s
 - Another user’s cards never appear
 - Typical-use bar holds: cards teach context, collocation, and grammar pattern — not C1/C2-sounding showpieces
 
+### US-02: Create an account and sign in
+
+- **Given** a self-learner who does not yet have an account
+- **When** they register with email and password and then sign in
+- **Then** they have an account of their own and can persist flashcards on it; they do not see anyone else’s cards
+
+#### Acceptance Criteria
+- Registration creates the account used for later sign-in
+- Unauthenticated visitors cannot keep a saved deck
+
 ## Functional Requirements
 
 ### Authentication and persistence
 - FR-001: Self-learner can sign in with email and password. Priority: must-have
   > Socrates: Counter-argument considered: "Email+password is simpler to operate than magic links for v1." Resolution: revised; MVP login is email + password; passwordless is out of MVP.
+- FR-010: Self-learner can create an account with email and password. Priority: must-have
+  > Socrates: Counter-argument considered: "Sign-in without sign-up leaves the auth rubric incomplete — a user cannot be tied to resources they never registered." Resolution: added as must-have after shape close; registration is required so login has an account to bind cards to.
 - FR-009: Self-learner can keep flashcards on their account across sessions. Priority: must-have
   > Socrates: Counter-argument considered: "Cross-session storage without export locks the learner in"; "a refresh-lose-all prototype would validate generation faster." Resolution: kept; stands as written.
 
@@ -124,7 +136,7 @@ Inputs are a word list or short text the self-learner pastes, plus any edits the
 
 ## Access Control
 
-Email + password login. Simple user accounts store each self-learner’s flashcards.
+Email + password sign-up and login. Simple user accounts store each self-learner’s flashcards.
 
 Flat user model: every account owns only its own cards. No admin / member / guest roles. Unauthenticated visitors cannot keep a saved deck. Sharing flashcard decks between users is out of MVP. Passwordless (magic link / email one-time code) is out of MVP.
 
