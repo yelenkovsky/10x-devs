@@ -10,13 +10,13 @@
 - New tables live in `supabase/migrations/` as `YYYYMMDDHHmmss_short_description.sql`, with RLS on and per-operation, per-role policies.
 - `SUPABASE_URL` and `SUPABASE_KEY` are server-only (@astro.config.mjs `env.schema`). For `npm run dev`, copy @.env.example to `.dev.vars`. Never read those secrets from React islands.
 - Add authenticated paths to `PROTECTED_ROUTES` in @src/middleware.ts (currently `/dashboard`).
-- CI (@.github/workflows/ci.yml) triggers on `master`; the git default branch is `main`.
+- CI (@.github/workflows/ci.yml) lints and builds on push/PR to `main`, then deploys the Worker on merge to `main`.
 
 ## Commands
 
 Node 22.14.0 (@.nvmrc), npm (@package.json). `npm run dev` uses Cloudflare workerd.
 
-CI runs `npx astro sync`, `npm run lint`, then `npm run build` with `SUPABASE_URL`/`SUPABASE_KEY` secrets. No test runner or `*.test.*` files exist.
+CI runs `npx astro sync`, `npm run lint`, then `npm run build` with `SUPABASE_URL`/`SUPABASE_KEY` secrets. Merge to `main` also runs `wrangler deploy` via `cloudflare/wrangler-action` (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`). No test runner or `*.test.*` files exist.
 
 ## Layout
 
