@@ -10,17 +10,13 @@
 - New tables live in `supabase/migrations/` as `YYYYMMDDHHmmss_short_description.sql`, with RLS on and per-operation, per-role policies.
 - `SUPABASE_URL` and `SUPABASE_KEY` are server-only (@astro.config.mjs `env.schema`). For `npm run dev`, copy @.env.example to `.dev.vars`. Never read those secrets from React islands.
 - Add authenticated paths to `PROTECTED_ROUTES` in @src/middleware.ts (currently `/dashboard`).
+- CI (@.github/workflows/ci.yml) triggers on `master`; the git default branch is `main`.
 
 ## Commands
 
-Node 22.14.0 (@.nvmrc), npm (@package.json).
+Node 22.14.0 (@.nvmrc), npm (@package.json). `npm run dev` uses Cloudflare workerd.
 
-- `npm run dev` — Cloudflare workerd
-- `npm run lint` / `npm run lint:fix` — type-checked ESLint (@eslint.config.js)
-- `npm run build` — SSR production build (`@astrojs/cloudflare`)
-- `npm run format` — Prettier, printWidth 120 (@.prettierrc.json)
-
-CI (@.github/workflows/ci.yml) runs `npx astro sync`, `npm run lint`, then `npm run build` with `SUPABASE_URL`/`SUPABASE_KEY` secrets. The workflow triggers on `master`; the git default branch is `main`. No test runner or `*.test.*` files exist.
+CI runs `npx astro sync`, `npm run lint`, then `npm run build` with `SUPABASE_URL`/`SUPABASE_KEY` secrets. No test runner or `*.test.*` files exist.
 
 ## Layout
 
@@ -29,10 +25,8 @@ CI (@.github/workflows/ci.yml) runs `npx astro sync`, `npm run lint`, then `npm 
 - `src/lib/` — helpers (extract to `src/lib/services/` when needed); shared DTOs in `src/types.ts`
 - Auth client: @src/lib/supabase.ts. Product docs: @context/foundation/prd.md, @context/foundation/tech-stack.md
 
-Alias `@/*` maps to `./src/*` (@tsconfig.json).
-
 ## Style and commits
 
-Component files use PascalCase (`SignInForm.tsx`, `Topbar.astro`). Husky lint-staged runs ESLint `--fix` on `*.{ts,tsx,astro}` and Prettier on `*.{json,css,md}`.
+Husky lint-staged runs ESLint `--fix` on `*.{ts,tsx,astro}` and Prettier on `*.{json,css,md}`.
 
 Commit with imperative sentence-case and no Conventional Commits prefix (example: `Require email+password sign-up so cards bind to a registered user.`). Remote: `https://origin.cursor.com/yelenkovsky/10x-devs`.
