@@ -10,3 +10,7 @@ archived_at: null
 ## Notes
 
 I need to add a feature to the roadmap, where user could add an api key from openrouter
+
+Settings, signed-in: pasting a real `sk-or-` key returned “User secrets key is not configured.”
+
+Write-up: `follow-ups/review-fixes.md` (`3a1e0e2`).
