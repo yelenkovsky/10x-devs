@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { OPENROUTER_MODEL, USER_SECRETS_KEY } from "astro:env/server";
+import { OPENROUTER_MODEL } from "astro:env/server";
+import { getUserSecretsKey } from "@/lib/user-secrets-key";
 import { z } from "zod";
 import { flashcardFieldsSchema, type FlashcardFields } from "@/lib/services/flashcard-fields";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
@@ -112,7 +113,7 @@ const GENERATION_INVALID_KEY_MESSAGE = "This OpenRouter key was rejected. Replac
 export async function generateCards(input: GenerateCardsInput): Promise<GenerateCardsResponse> {
   let apiKey: string;
   try {
-    const decrypted = await loadDecryptedOpenRouterApiKey(input.supabase, USER_SECRETS_KEY, input.userId);
+    const decrypted = await loadDecryptedOpenRouterApiKey(input.supabase, getUserSecretsKey(), input.userId);
     if (!decrypted) {
       throw new GenerateCardsError("generation_not_configured", GENERATION_NOT_CONFIGURED_MESSAGE);
     }

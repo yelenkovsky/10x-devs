@@ -1,6 +1,10 @@
 /// <reference types="vitest/config" />
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { AstroIntegration } from "astro";
 import { getViteConfig } from "astro/config";
+
+const testDir = path.dirname(fileURLToPath(import.meta.url));
 
 /** Test-only adapter so Vitest does not load `@astrojs/cloudflare` / workerd (#15847 / #15878). */
 function vitestNodeAdapter(): AstroIntegration {
@@ -25,6 +29,11 @@ function vitestNodeAdapter(): AstroIntegration {
 
 export default getViteConfig(
   {
+    resolve: {
+      alias: {
+        "cloudflare:workers": path.join(testDir, "src/test/cloudflare-workers-stub.ts"),
+      },
+    },
     test: {
       environment: "node",
     },
