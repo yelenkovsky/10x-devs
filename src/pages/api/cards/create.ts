@@ -1,18 +1,10 @@
 import type { APIRoute } from "astro";
-import { z } from "zod";
 import { requireUser } from "@/lib/auth";
+import { createFlashcard, CreateFlashcardError } from "@/lib/services/create-flashcard";
 import { flashcardFieldsSchema } from "@/lib/services/flashcard-fields";
-import { mutateFlashcard, MutateFlashcardError } from "@/lib/services/mutate-flashcard";
 import { createClient } from "@/lib/supabase";
 
 export const prerender = false;
-
-const mutateBodySchema = z.discriminatedUnion("action", [
-  z.object({ action: z.literal("keep") }),
-  z.object({ action: z.literal("unkeep") }),
-  z.object({ action: z.literal("delete") }),
-  flashcardFieldsSchema.extend({ action: z.literal("edit") }),
-]);
 
 export const POST: APIRoute = async (context) => {
   const unauthorized = requireUser(context.locals);
@@ -25,11 +17,6 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Service is not configured." }, 503);
   }
 
-  const idParsed = z.uuid().safeParse(context.params.id);
-  if (!idParsed.success) {
-    return jsonResponse({ error: "Invalid card id" }, 400);
-  }
-
   let body: unknown;
   try {
     body = (await context.request.json()) as unknown;
@@ -37,24 +24,23 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Invalid request body" }, 400);
   }
 
-  const parsed = mutateBodySchema.safeParse(body);
+  const parsed = flashcardFieldsSchema.safeParse(body);
   if (!parsed.success) {
-    return jsonResponse({ error: "Invalid request body" }, 400);
+    return jsonResponse({ error: "All card fields are required.", code: "invalid_fields" }, 400);
   }
 
   try {
-    const result = await mutateFlashcard({
+    const result = await createFlashcard({
       userId: context.locals.user.id,
-      id: idParsed.data,
-      request: parsed.data,
+      fields: parsed.data,
       supabase,
     });
     return jsonResponse(result, 200);
   } catch (error) {
-    if (error instanceof MutateFlashcardError) {
+    if (error instanceof CreateFlashcardError) {
       return jsonResponse({ error: error.message, code: error.code }, error.status);
     }
-    return jsonResponse({ error: "Could not change the card. Try again.", code: "card_unavailable" }, 503);
+    return jsonResponse({ error: "Could not create the card. Try again.", code: "card_unavailable" }, 503);
   }
 };
 

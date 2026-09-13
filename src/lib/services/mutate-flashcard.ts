@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { flashcardFieldsSchema } from "@/lib/services/flashcard-fields";
 import { FSRS_NULL_PATCH } from "@/lib/services/flashcard-fsrs";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
 import type {
@@ -9,15 +10,6 @@ import type {
   MutateFlashcardDeleteResponse,
   MutateFlashcardRequest,
 } from "@/types";
-
-const editFieldsSchema = z.object({
-  cloze: z.string().trim().min(1),
-  wordPhrase: z.string().trim().min(1),
-  fullSentence: z.string().trim().min(1),
-  definition: z.string().trim().min(1),
-  collocationPattern: z.string().trim().min(1),
-  translationPl: z.string().trim().min(1),
-});
 
 const deletedIdSchema = z.object({
   id: z.string().min(1),
@@ -61,7 +53,7 @@ export async function mutateFlashcard(
     case "delete":
       return { id: await deleteOwnedCard(input) };
     case "edit": {
-      const fields = editFieldsSchema.safeParse(input.request);
+      const fields = flashcardFieldsSchema.safeParse(input.request);
       if (!fields.success) {
         throw new MutateFlashcardError("invalid_fields", "All card fields are required.", 400);
       }

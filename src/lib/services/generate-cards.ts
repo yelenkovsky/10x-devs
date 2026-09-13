@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { OPENROUTER_API_KEY, OPENROUTER_MODEL } from "astro:env/server";
 import { z } from "zod";
+import { flashcardFieldsSchema, type FlashcardFields } from "@/lib/services/flashcard-fields";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
 import type { Flashcard, GenerateCardsResponse } from "@/types";
 
@@ -22,15 +23,6 @@ Each card must include:
 - translationPl: a natural Polish translation of the full sentence
 
 One card per target item. If the input is a list, each list item is a target. If the input is prose, extract the useful target words or phrases. If there are more than 15 items, use the first 15 in input order. Return at most 15 cards.`;
-
-const generatedCardSchema = z.object({
-  cloze: z.string().trim().min(1),
-  wordPhrase: z.string().trim().min(1),
-  fullSentence: z.string().trim().min(1),
-  definition: z.string().trim().min(1),
-  collocationPattern: z.string().trim().min(1),
-  translationPl: z.string().trim().min(1),
-});
 
 const cardsEnvelopeSchema = z.object({
   cards: z.array(z.unknown()),
@@ -127,10 +119,10 @@ export async function generateCards(input: GenerateCardsInput): Promise<Generate
   const truncated = envelope.data.cards.length >= CARD_CAP;
   const candidates = envelope.data.cards.slice(0, CARD_CAP);
 
-  const validCards: z.infer<typeof generatedCardSchema>[] = [];
+  const validCards: FlashcardFields[] = [];
   let failedCount = 0;
   for (const candidate of candidates) {
-    const parsed = generatedCardSchema.safeParse(candidate);
+    const parsed = flashcardFieldsSchema.safeParse(candidate);
     if (parsed.success) {
       validCards.push(parsed.data);
     } else {
@@ -214,7 +206,7 @@ function parseJsonContent(content: string): unknown {
 async function persistValidCards(
   supabase: SupabaseClient,
   userId: string,
-  validCards: z.infer<typeof generatedCardSchema>[],
+  validCards: FlashcardFields[],
 ): Promise<Flashcard[]> {
   if (validCards.length === 0) {
     return [];

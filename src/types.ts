@@ -21,6 +21,19 @@ export interface GenerateCardsResponse {
   cap: number;
 }
 
+export interface CreateFlashcardRequest {
+  cloze: string;
+  wordPhrase: string;
+  fullSentence: string;
+  definition: string;
+  collocationPattern: string;
+  translationPl: string;
+}
+
+export interface CreateFlashcardResponse {
+  card: Flashcard;
+}
+
 export type MutateFlashcardRequest =
   | { action: "keep" }
   | { action: "unkeep" }

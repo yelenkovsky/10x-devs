@@ -257,12 +257,12 @@ No new migration. `generation_id` stays `NOT NULL`; the service supplies a UUID.
 
 #### Automated
 
-- [ ] 1.1 `src/pages/api/cards/create.ts` exports `const prerender = false` and `POST`
-- [ ] 1.2 `src/types.ts` exports `CreateFlashcardRequest`
-- [ ] 1.3 Generate, mutate edit, and create import the same six-field trim+min(1) schema (no third private copy)
-- [ ] 1.4 `npx astro sync` succeeds
-- [ ] 1.5 `npm run lint` succeeds
-- [ ] 1.6 `npm run build` succeeds
+- [x] 1.1 `src/pages/api/cards/create.ts` exports `const prerender = false` and `POST`
+- [x] 1.2 `src/types.ts` exports `CreateFlashcardRequest`
+- [x] 1.3 Generate, mutate edit, and create import the same six-field trim+min(1) schema (no third private copy)
+- [x] 1.4 `npx astro sync` succeeds
+- [x] 1.5 `npm run lint` succeeds
+- [x] 1.6 `npm run build` succeeds
 
 #### Manual
 
