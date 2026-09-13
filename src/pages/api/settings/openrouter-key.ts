@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
-import { USER_SECRETS_KEY } from "astro:env/server";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { deleteOpenRouterKey, OpenRouterKeyError, saveOpenRouterKey } from "@/lib/services/openrouter-key";
 import { UserSecretsError } from "@/lib/services/user-secrets";
 import { createClient } from "@/lib/supabase";
+import { getUserSecretsKey } from "@/lib/user-secrets-key";
 
 export const prerender = false;
 
@@ -25,7 +25,8 @@ export const POST: APIRoute = async (context) => {
     return jsonResponse({ error: "Service is not configured." }, 503);
   }
 
-  if (!USER_SECRETS_KEY) {
+  const wrappingKey = getUserSecretsKey();
+  if (!wrappingKey) {
     return jsonResponse({ error: "User secrets key is not configured." }, 503);
   }
 
@@ -45,7 +46,7 @@ export const POST: APIRoute = async (context) => {
     const status = await saveOpenRouterKey({
       userId: context.locals.user.id,
       apiKey: parsed.data.apiKey,
-      wrappingKey: USER_SECRETS_KEY,
+      wrappingKey,
       supabase,
     });
     return jsonResponse(status, 200);
