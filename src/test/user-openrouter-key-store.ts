@@ -79,12 +79,16 @@ export function createUserOpenRouterKeyStore() {
           },
           select(_columns: string) {
             return {
-              maybeSingle() {
-                const row = rows.get(userId);
-                return Promise.resolve({
-                  data: row ?? null,
-                  error: null,
-                });
+              eq(column: string, value: string) {
+                return {
+                  maybeSingle() {
+                    const row = column === "user_id" && value === userId ? (rows.get(value) ?? null) : null;
+                    return Promise.resolve({
+                      data: row,
+                      error: null,
+                    });
+                  },
+                };
               },
             };
           },

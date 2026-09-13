@@ -6,12 +6,13 @@ import { loadOpenRouterKeyHint } from "@/lib/services/openrouter-key";
 import { createClient } from "@/lib/supabase";
 import type { OpenRouterKeyStatus } from "@/types";
 
+const { user } = Astro.locals;
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 let keyStatus: OpenRouterKeyStatus = { configured: false };
-let loadError = !supabase;
-if (supabase) {
+let loadError = !supabase || !user;
+if (supabase && user) {
   try {
-    keyStatus = await loadOpenRouterKeyHint(supabase);
+    keyStatus = await loadOpenRouterKeyHint(supabase, user.id);
   } catch {
     loadError = true;
   }

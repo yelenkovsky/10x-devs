@@ -7,21 +7,23 @@ import { loadOpenRouterKeyHint } from "@/lib/services/openrouter-key";
 import { createClient } from "@/lib/supabase";
 import type { Flashcard } from "@/types";
 
+const { user } = Astro.locals;
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 let cards: Flashcard[] = [];
 let configured = false;
-let loadError = !supabase;
-if (supabase) {
+let loadError = !supabase || !user;
+let keyLoadError = !supabase || !user;
+if (supabase && user) {
   try {
     cards = await listFlashcards(supabase);
   } catch {
     loadError = true;
   }
   try {
-    const keyStatus = await loadOpenRouterKeyHint(supabase);
+    const keyStatus = await loadOpenRouterKeyHint(supabase, user.id);
     configured = keyStatus.configured;
   } catch {
-    configured = false;
+    keyLoadError = true;
   }
 }
 ---
@@ -35,7 +37,13 @@ if (supabase) {
           Dashboard
         </h1>
       </header>
-      <PasteGenerate initialCards={cards} loadError={loadError} configured={configured} client:load />
+      <PasteGenerate
+        initialCards={cards}
+        loadError={loadError}
+        keyLoadError={keyLoadError}
+        configured={configured}
+        client:load
+      />
     </div>
   </div>
 </Layout>

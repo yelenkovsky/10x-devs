@@ -146,7 +146,7 @@ Let a signed-in learner save, replace, and remove their key on `/settings`, with
 
 **Intent**: Persist and delete the key on the server so the island never holds ciphertext.
 
-**Contract**: `export const prerender = false`. `POST` and `DELETE` only. `requireUser` first (401 `{ error: "Authentication required" }`). Missing Supabase or `USER_SECRETS_KEY` → 503, stable copy, no `code` required on the Supabase-missing path (match generate’s “Service is not configured.”). `POST` body `{ apiKey: string }` via zod using the Phase 1 prefix rule. Empty/whitespace/bad prefix → 400 `{ error, code: "invalid_key_format" }`. Success → 200 `OpenRouterKeyStatus` with `configured: true` and `last4`. Replace is upsert on `user_id` (one row). `DELETE` removes the row; 200 `{ configured: false }`. Do not return plaintext, nonce, or ciphertext. Persist `user_id` from `locals.user.id` only.
+**Contract**: `export const prerender = false`. `POST` and `DELETE` only. `requireUser` first (401 `{ error: "Authentication required" }`). Missing Supabase → 503 on POST and DELETE, stable copy, no `code` required (match generate’s “Service is not configured.”). Missing or invalid `USER_SECRETS_KEY` → 503 on POST only; DELETE does not encrypt, so a learner can still remove unreadable ciphertext. `POST` body `{ apiKey: string }` via zod using the Phase 1 prefix rule. Empty/whitespace/bad prefix → 400 `{ error, code: "invalid_key_format" }`. Success → 200 `OpenRouterKeyStatus` with `configured: true` and `last4`. Replace is upsert on `user_id` (one row). `DELETE` removes the row; 200 `{ configured: false }`. Do not return plaintext, nonce, or ciphertext. Persist `user_id` from `locals.user.id` only.
 
 #### 2. Settings page and form island
 

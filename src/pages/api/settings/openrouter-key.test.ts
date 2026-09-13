@@ -121,8 +121,8 @@ describe("POST/DELETE /api/settings/openrouter-key", () => {
     await POST(apiContext({ method: "POST", userId: USER_B, body: { apiKey: KEY_B } }));
 
     const { loadOpenRouterKeyHint } = await import("@/lib/services/openrouter-key");
-    const asA = await loadOpenRouterKeyHint(store.clientFor(USER_A));
-    const asB = await loadOpenRouterKeyHint(store.clientFor(USER_B));
+    const asA = await loadOpenRouterKeyHint(store.clientFor(USER_A), USER_A);
+    const asB = await loadOpenRouterKeyHint(store.clientFor(USER_B), USER_B);
 
     expect(asB).toEqual({ configured: true, last4: "bbbb" });
     expect(asA).toEqual({ configured: false });

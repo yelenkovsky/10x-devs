@@ -112,7 +112,7 @@ const GENERATION_INVALID_KEY_MESSAGE = "This OpenRouter key was rejected. Replac
 export async function generateCards(input: GenerateCardsInput): Promise<GenerateCardsResponse> {
   let apiKey: string;
   try {
-    const decrypted = await loadDecryptedOpenRouterApiKey(input.supabase, USER_SECRETS_KEY);
+    const decrypted = await loadDecryptedOpenRouterApiKey(input.supabase, USER_SECRETS_KEY, input.userId);
     if (!decrypted) {
       throw new GenerateCardsError("generation_not_configured", GENERATION_NOT_CONFIGURED_MESSAGE);
     }
