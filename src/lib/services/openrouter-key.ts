@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { encryptSecret } from "@/lib/services/user-secrets";
+import { decryptSecret, encryptSecret } from "@/lib/services/user-secrets";
 import type { OpenRouterKeyStatus } from "@/types";
 
 export class OpenRouterKeyError extends Error {
@@ -25,6 +25,8 @@ export const USER_OPENROUTER_KEY_COLUMNS = "user_id, nonce, ciphertext, last4, c
 
 export const USER_OPENROUTER_KEY_HINT_COLUMNS = "last4";
 
+export const USER_OPENROUTER_KEY_SECRET_COLUMNS = "nonce, ciphertext";
+
 export const userOpenRouterKeyRowSchema = z.object({
   user_id: z.string(),
   nonce: z.string(),
@@ -38,8 +40,14 @@ export const userOpenRouterKeyHintRowSchema = z.object({
   last4: z.string(),
 });
 
+export const userOpenRouterKeySecretRowSchema = z.object({
+  nonce: z.string(),
+  ciphertext: z.string(),
+});
+
 export type UserOpenRouterKeyRow = z.infer<typeof userOpenRouterKeyRowSchema>;
 export type UserOpenRouterKeyHintRow = z.infer<typeof userOpenRouterKeyHintRowSchema>;
+export type UserOpenRouterKeySecretRow = z.infer<typeof userOpenRouterKeySecretRowSchema>;
 
 const OPENROUTER_KEY_PREFIX = "sk-or-";
 
@@ -82,6 +90,31 @@ export async function loadOpenRouterKeyHint(supabase: SupabaseClient): Promise<O
   }
 
   return toOpenRouterKeyStatus(parsed.data);
+}
+
+export async function loadDecryptedOpenRouterApiKey(
+  supabase: SupabaseClient,
+  wrappingKey: string | undefined,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("user_openrouter_keys")
+    .select(USER_OPENROUTER_KEY_SECRET_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw unavailable("Could not load the API key. Try again.");
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  const parsed = userOpenRouterKeySecretRowSchema.safeParse(data);
+  if (!parsed.success) {
+    throw unavailable("Could not load the API key. Try again.");
+  }
+
+  return decryptSecret(parsed.data.nonce, parsed.data.ciphertext, wrappingKey);
 }
 
 export interface SaveOpenRouterKeyInput {

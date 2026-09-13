@@ -43,6 +43,7 @@ const generateErrorSchema = z.object({
 interface PasteGenerateProps {
   initialCards: Flashcard[];
   loadError?: boolean;
+  configured: boolean;
 }
 
 interface BatchNotes {
@@ -51,7 +52,7 @@ interface BatchNotes {
   cap: number;
 }
 
-export default function PasteGenerate({ initialCards, loadError = false }: PasteGenerateProps) {
+export default function PasteGenerate({ initialCards, loadError = false, configured }: PasteGenerateProps) {
   const [paste, setPaste] = useState("");
   const [cards, setCards] = useState(initialCards);
   const [emptyState, setEmptyState] = useState(false);
@@ -63,6 +64,9 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
 
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!configured) {
+      return;
+    }
     const trimmed = paste.trim();
 
     if (trimmed === "") {
@@ -165,6 +169,22 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
           </p>
         </div>
 
+        {!configured ? (
+          <p
+            className="mt-4 flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80"
+            role="status"
+          >
+            <CircleAlert className="size-4 shrink-0" />
+            <span>
+              Add your OpenRouter API key in{" "}
+              <a href="/settings" className="text-purple-300 underline-offset-4 hover:text-purple-100 hover:underline">
+                Settings
+              </a>{" "}
+              to generate cards.
+            </span>
+          </p>
+        ) : null}
+
         {emptyState ? (
           <p
             className="mt-4 flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80"
@@ -201,7 +221,7 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
 
         <Button
           type="submit"
-          disabled={isGenerating}
+          disabled={isGenerating || !configured}
           className="mt-4 rounded-lg bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-500"
         >
           {isGenerating ? (
