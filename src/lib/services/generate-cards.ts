@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { OPENROUTER_API_KEY, OPENROUTER_MODEL } from "astro:env/server";
+import { OPENROUTER_MODEL } from "astro:env/server";
 import { z } from "zod";
 import { flashcardFieldsSchema, type FlashcardFields } from "@/lib/services/flashcard-fields";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
@@ -105,12 +105,18 @@ export interface GenerateCardsInput {
   supabase: SupabaseClient;
 }
 
+function resolveGenerateApiKey(): string | undefined {
+  // Operator OPENROUTER_API_KEY was removed in Phase 1. User-key decrypt lands in Phase 3.
+  return undefined;
+}
+
 export async function generateCards(input: GenerateCardsInput): Promise<GenerateCardsResponse> {
-  if (!OPENROUTER_API_KEY) {
+  const apiKey = resolveGenerateApiKey();
+  if (!apiKey) {
     throw new GenerateCardsError("generation_not_configured", "Generation is not configured.");
   }
 
-  const content = await requestOpenRouterCards(input.paste, input.origin);
+  const content = await requestOpenRouterCards(input.paste, input.origin, apiKey);
   const envelope = cardsEnvelopeSchema.safeParse(parseJsonContent(content));
   if (!envelope.success) {
     throw unavailable();
@@ -134,7 +140,7 @@ export async function generateCards(input: GenerateCardsInput): Promise<Generate
   return { cards, failedCount, truncated, cap: CARD_CAP };
 }
 
-async function requestOpenRouterCards(paste: string, origin: string): Promise<string> {
+async function requestOpenRouterCards(paste: string, origin: string, apiKey: string): Promise<string> {
   const model = OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
   let response: Response;
 
@@ -142,7 +148,7 @@ async function requestOpenRouterCards(paste: string, origin: string): Promise<st
     response = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
         "HTTP-Referer": origin,
         "X-Title": "10xUsage",

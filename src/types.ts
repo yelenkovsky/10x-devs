@@ -1,3 +1,8 @@
+export interface OpenRouterKeyStatus {
+  configured: boolean;
+  last4?: string;
+}
+
 export type FlashcardStatus = "generated" | "kept";
 
 export interface Flashcard {
