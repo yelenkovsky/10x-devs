@@ -37,7 +37,7 @@ function toFlashcard(row: z.infer<typeof flashcardRowSchema>): Flashcard {
 
 function parseFlashcardRows(data: unknown): Flashcard[] {
   if (!Array.isArray(data)) {
-    return [];
+    throw new Error("Flashcard list payload is invalid.");
   }
 
   const cards: Flashcard[] = [];
@@ -47,6 +47,11 @@ function parseFlashcardRows(data: unknown): Flashcard[] {
       cards.push(toFlashcard(parsed.data));
     }
   }
+
+  if (data.length > 0 && cards.length === 0) {
+    throw new Error("Flashcard list payload is invalid.");
+  }
+
   return cards;
 }
 
@@ -57,7 +62,7 @@ export async function listFlashcards(supabase: SupabaseClient): Promise<Flashcar
     .order("created_at", { ascending: false });
 
   if (error) {
-    return [];
+    throw new Error("Failed to load flashcards.");
   }
 
   return parseFlashcardRows(data);

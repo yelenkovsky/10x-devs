@@ -3,10 +3,19 @@ import PasteGenerate from "@/components/cards/PasteGenerate";
 import Layout from "@/layouts/Layout.astro";
 import { listFlashcards } from "@/lib/services/list-flashcards";
 import { createClient } from "@/lib/supabase";
+import type { Flashcard } from "@/types";
 
 const { user } = Astro.locals;
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-const cards = supabase ? await listFlashcards(supabase) : [];
+let cards: Flashcard[] = [];
+let loadError = !supabase;
+if (supabase) {
+  try {
+    cards = await listFlashcards(supabase);
+  } catch {
+    loadError = true;
+  }
+}
 ---
 
 <Layout title="Dashboard">
@@ -32,7 +41,7 @@ const cards = supabase ? await listFlashcards(supabase) : [];
           </button>
         </form>
       </header>
-      <PasteGenerate initialCards={cards} client:load />
+      <PasteGenerate initialCards={cards} loadError={loadError} client:load />
     </div>
   </div>
 </Layout>

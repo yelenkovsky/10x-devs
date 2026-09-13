@@ -180,6 +180,8 @@ Replace the dashboard stub with paste, a progress panel, and the learner’s per
 
 **Contract**: Load cards with `createClient(Astro.request.headers, Astro.cookies)` ordered `created_at` desc. Pass them into the island. Keep sign-out. Do not add a new HTML route or a `PROTECTED_ROUTES` entry.
 
+**Addendum (impl-review):** Dashboard load lives in `src/lib/services/list-flashcards.ts`; the page still calls `createClient` and passes the mapped cards into the island.
+
 #### 2. Paste, progress, and card list island
 
 **Files**: `src/components/cards/PasteGenerate.tsx` (new), `src/components/hooks/` as needed
