@@ -1,7 +1,7 @@
 ---
 change_id: testing-critical-path-coverage
 title: Critical-path coverage for isolation and generate contracts
-status: planned
+status: implementing
 created: 2026-09-13
 updated: 2026-09-13
 archived_at: null
