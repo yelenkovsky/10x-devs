@@ -172,7 +172,7 @@ Roadmap table still lists S-01/S-03 `in-progress` and S-04 not ready for `/10x-p
 
 ## Historical Context (from prior changes)
 
-This file previously held a **library survey** (same change, 2026-09-13, method: exa-web-search). Recommendation **stands: `ts-fsrs`**. Official Open Spaced Repetition FSRS-6, ESM/CJS, ~0 runtime deps, `createEmptyCard` / `repeat` / `next` API. Fallback if the slice wants three numbers only: `supermemo` (SM-2). Rejected for this stack: `@open-spaced-repetition/binding` (NAPI), `fsrs-browser` (WASM trainer), `rs-fsrs-nodejs`, Nest/Prisma engines, Anki.
+The library survey lives in `library-survey.md` (same change, 2026-09-13, method: exa-web-search; restored from `d2c9293`). Recommendation **stands: `ts-fsrs`**. Official Open Spaced Repetition FSRS-6, ESM/CJS, ~0 runtime deps, `createEmptyCard` / `repeat` / `next` API. Fallback if the slice wants three numbers only: `supermemo` (SM-2). Rejected for this stack: `@open-spaced-repetition/binding` (NAPI), `fsrs-browser` (WASM trainer), `rs-fsrs-nodejs`, Nest/Prisma engines, Anki.
 
 That survey also said: run the scheduler on the server; persist `due` + algorithm state; queue `due <= now()`; **on S-03 accept, store `createEmptyCard()`**. S-03 later **overrode** the last sentence — keep is status-only (`gate-generated-cards/plan.md`, `plan-brief.md` L28). The API notes’ “or first review” is the reconciliation.
 
@@ -184,7 +184,7 @@ That survey also said: run the scheduler on the server; persist `due` + algorith
 
 ## Related Research
 
-- This file (library survey, 2026-09-13) — recommendation `ts-fsrs`; superseded as the *lead* artifact by this compatibility pass, recommendation unchanged
+- [`library-survey.md`](./library-survey.md) — S-04 ready-made SRS library survey; recommendation `ts-fsrs`
 - [`context/changes/ts-fsrs-api-docs.md`](https://github.com/yelenkovsky/10x-devs/blob/0ace5d30c939970ba40722ad9d4147f41177a5df/context/changes/ts-fsrs-api-docs.md) — Context7 excerpts for `ts-fsrs` (not a change-folder identity file)
 
 ## Open Questions
