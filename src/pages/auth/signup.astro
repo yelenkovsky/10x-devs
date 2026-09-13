@@ -32,7 +32,7 @@ const signinHref = `/auth/signin${authPageQuery({ next })}`;
           </p>
         )
       }
-      <SignUpForm serverError={error} next={nextField} client:load />
+      <SignUpForm serverError={error} next={nextField ?? null} />
       <p class="mt-4 text-center text-sm text-blue-100/60">
         Already have an account?{" "}
         <a href={signinHref} class="text-purple-300 hover:underline">Sign in</a>

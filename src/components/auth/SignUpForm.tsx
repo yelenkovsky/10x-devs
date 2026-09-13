@@ -9,7 +9,7 @@ const MIN_PASSWORD_LENGTH = 6;
 
 interface Props {
   serverError?: string | null;
-  next?: string;
+  next?: string | null;
 }
 
 export default function SignUpForm({ serverError, next }: Props) {

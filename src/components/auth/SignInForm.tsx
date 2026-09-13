@@ -7,7 +7,7 @@ import { ServerError } from "@/components/auth/ServerError";
 
 interface Props {
   serverError?: string | null;
-  next?: string;
+  next?: string | null;
 }
 
 export default function SignInForm({ serverError, next }: Props) {
