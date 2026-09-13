@@ -321,12 +321,12 @@ S-05 insert-as-kept can stay lazy: null FSRS until first grade. Do not invent a 
 
 #### Automated
 
-- [x] 2.1 `src/pages/review.astro` exists and hydrates a `client:load` review island
-- [x] 2.2 `PROTECTED_ROUTES` includes `/review`
-- [x] 2.3 Dashboard header links to `/review`; review page links to `/dashboard`
-- [x] 2.4 `npx astro sync` succeeds
-- [x] 2.5 `npm run lint` succeeds
-- [x] 2.6 `npm run build` succeeds
+- [x] 2.1 `src/pages/review.astro` exists and hydrates a `client:load` review island — fe5ae2b
+- [x] 2.2 `PROTECTED_ROUTES` includes `/review` — fe5ae2b
+- [x] 2.3 Dashboard header links to `/review`; review page links to `/dashboard` — fe5ae2b
+- [x] 2.4 `npx astro sync` succeeds — fe5ae2b
+- [x] 2.5 `npm run lint` succeeds — fe5ae2b
+- [x] 2.6 `npm run build` succeeds — fe5ae2b
 
 #### Manual
 
