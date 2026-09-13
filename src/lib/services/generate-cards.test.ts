@@ -124,6 +124,7 @@ describe("generateCards user key", () => {
     });
 
     expect(openRouterFetch).toHaveBeenCalledOnce();
+    expect(store.rows.get(USER_A)).toBeDefined();
     expect(store.flashcards).toHaveLength(0);
   });
 

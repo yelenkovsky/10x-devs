@@ -13,6 +13,7 @@ const EMPTY_PASTE_MESSAGE = "Paste a word list or a short paragraph first. Empty
 const PASTE_TOO_LONG_MESSAGE = "Paste is too long. Use 4000 characters or fewer.";
 const GENERIC_GENERATE_ERROR = "Generation is temporarily unavailable. Try again.";
 const LOAD_ERROR_MESSAGE = "Cards could not be loaded. Refresh to try again.";
+const KEY_LOAD_ERROR_MESSAGE = "Could not load your OpenRouter key status. Refresh to try again.";
 
 const flashcardSchema = z.object({
   id: z.string(),
@@ -43,6 +44,7 @@ const generateErrorSchema = z.object({
 interface PasteGenerateProps {
   initialCards: Flashcard[];
   loadError?: boolean;
+  keyLoadError?: boolean;
   configured: boolean;
 }
 
@@ -52,7 +54,12 @@ interface BatchNotes {
   cap: number;
 }
 
-export default function PasteGenerate({ initialCards, loadError = false, configured }: PasteGenerateProps) {
+export default function PasteGenerate({
+  initialCards,
+  loadError = false,
+  keyLoadError = false,
+  configured,
+}: PasteGenerateProps) {
   const [paste, setPaste] = useState("");
   const [cards, setCards] = useState(initialCards);
   const [emptyState, setEmptyState] = useState(false);
@@ -169,7 +176,17 @@ export default function PasteGenerate({ initialCards, loadError = false, configu
           </p>
         </div>
 
-        {!configured ? (
+        {keyLoadError ? (
+          <p
+            className="mt-4 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300"
+            role="alert"
+          >
+            <CircleAlert className="size-4 shrink-0" />
+            {KEY_LOAD_ERROR_MESSAGE}
+          </p>
+        ) : null}
+
+        {!configured && !keyLoadError ? (
           <p
             className="mt-4 flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80"
             role="status"

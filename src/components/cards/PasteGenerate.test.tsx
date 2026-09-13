@@ -138,4 +138,26 @@ describe("PasteGenerate progress visibility", () => {
     expect(screen.queryByText("Generating typical-use cloze cards…")).toBeNull();
     assertInitialCardsUnchanged();
   });
+
+  it("shows a key-load alert and hides the Settings CTA when key status is unknown", () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    render(<PasteGenerate initialCards={[INITIAL_CARD]} configured={false} keyLoadError />);
+
+    const generate = screen.getByRole("button", { name: /^generate$/i });
+    expect(generate.hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("alert").textContent).toContain(
+      "Could not load your OpenRouter key status. Refresh to try again.",
+    );
+    expect(screen.queryByRole("link", { name: /^settings$/i })).toBeNull();
+
+    const form = generate.closest("form");
+    if (!(form instanceof HTMLFormElement)) {
+      throw new Error("expected generate form");
+    }
+    fireEvent.submit(form);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 });

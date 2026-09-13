@@ -59,7 +59,7 @@ describe("save, replace, delete, and isolation", () => {
       wrappingKey,
       supabase: store.clientFor(userA),
     });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "aaaa" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA), userA)).toEqual({ configured: true, last4: "aaaa" });
 
     await saveOpenRouterKey({
       userId: userA,
@@ -67,7 +67,7 @@ describe("save, replace, delete, and isolation", () => {
       wrappingKey,
       supabase: store.clientFor(userA),
     });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "bbbb" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA), userA)).toEqual({ configured: true, last4: "bbbb" });
     expect(store.rows.size).toBe(1);
 
     await saveOpenRouterKey({
@@ -76,13 +76,13 @@ describe("save, replace, delete, and isolation", () => {
       wrappingKey,
       supabase: store.clientFor(userB),
     });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "bbbb" });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userB))).toEqual({ configured: true, last4: "aaaa" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA), userA)).toEqual({ configured: true, last4: "bbbb" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userB), userB)).toEqual({ configured: true, last4: "aaaa" });
 
     expect(await deleteOpenRouterKey({ userId: userA, supabase: store.clientFor(userA) })).toEqual({
       configured: false,
     });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: false });
-    expect(await loadOpenRouterKeyHint(store.clientFor(userB))).toEqual({ configured: true, last4: "aaaa" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA), userA)).toEqual({ configured: false });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userB), userB)).toEqual({ configured: true, last4: "aaaa" });
   });
 });
