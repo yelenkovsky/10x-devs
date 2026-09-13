@@ -22,10 +22,10 @@ milestone_status: open
 
 **M-1: First session from paste** — Status: open
 
-- **Intent:** A self-learner can finish the first session in the Success Criteria: register and sign in, paste a word list or short text, receive typical-use cloze cards, accept/edit/delete them (or create one by hand), and review with a ready-made spaced-repetition algorithm.
+- **Intent:** A self-learner can finish the first session: register and sign in, add their OpenRouter API key, paste a word list or short text, receive typical-use cloze cards, accept/edit/delete them (or create one by hand), and review with a ready-made spaced-repetition algorithm.
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** every S-NN below is `done`.
-- **Scope anchors:** US-01, US-02, FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010 (all required FRs in this PRD).
+- **Scope anchors:** US-01, US-02, FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-009, FR-010, plus S-07 (user OpenRouter key; not in PRD v1).
 
 
 
@@ -48,6 +48,7 @@ The north star — the smallest end-to-end slice whose successful delivery would
 | S-04 | srs-review-session         | review their flashcards with a ready-made spaced-repetition algorithm            | S-03          | US-01, FR-008                         | in-progress |
 | S-05 | manual-card-create         | create a flashcard by hand with the same fields as generated cards               | S-01          | US-01, FR-006                         | in-progress |
 | S-06 | browse-flashcards          | browse their flashcards                                                          | S-01          | FR-007                                | in-progress |
+| S-07 | user-openrouter-key        | add their OpenRouter API key and generate with that key                          | S-02          | — (new; not in PRD v1)                | in-progress |
 
 
 
@@ -59,8 +60,8 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 
 | Stream | Theme           | Chain                    | Note                                                                                               |
 | ------ | --------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
-| A      | First session   | `S-01` → `S-03` → `S-04` | Speed path: generate, then gate, then review — closes the first session.                           |
-| B      | Account         | `S-02`                   | Standalone; sessions already exist in the baseline, so this can run beside Stream A.               |
+| A      | First session   | `S-01` → `S-03` → `S-04` | Speed path: generate, then gate, then review. After S-07, generate needs the learner’s key.        |
+| B      | Account         | `S-02` → `S-07`          | Sign-in, then BYOK. S-07 changes S-01 generate to user-key-only.                                   |
 | C      | Card collection | `S-05` → `S-06`          | Joins Stream A at `S-01`. Sequenced after the first session for speed; both depend only on `S-01`. |
 
 
@@ -94,7 +95,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** paste-generate-typical-use
 - **PRD refs:** US-01, FR-002, FR-003, FR-004, FR-009
 - **Prerequisites:** —
-- **Parallel with:** S-02
+- **Parallel with:** S-02, S-07
 - **Blockers:** —
 - **Unknowns:**
   - How to check the typical-use bar (context, collocation, grammar pattern — not C1/C2 showpieces) on generated cards without a labeled eval set — Owner: user. Block: no.
@@ -109,7 +110,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** email-password-account
 - **PRD refs:** US-02, FR-001, FR-010
 - **Prerequisites:** —
-- **Parallel with:** S-01, S-03, S-04, S-05, S-06
+- **Parallel with:** S-01, S-03, S-04, S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Auth is already present in the baseline; this slice exists so US-02 stays on the roadmap and any remaining gaps (unauthenticated visitors keeping a deck) get closed. It is not a reason to defer S-01.
@@ -123,7 +124,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** gate-generated-cards
 - **PRD refs:** US-01, FR-005
 - **Prerequisites:** S-01
-- **Parallel with:** S-02, S-05, S-06
+- **Parallel with:** S-02, S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Without this gate, generated cards land in the deck unreviewed and the first session skips a required step. Sequenced immediately after S-01 so review (S-04) can use kept cards, not raw model output.
@@ -137,7 +138,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** srs-review-session
 - **PRD refs:** US-01, FR-008
 - **Prerequisites:** S-03
-- **Parallel with:** S-02, S-05, S-06
+- **Parallel with:** S-02, S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Closes the first session. Custom scheduling is a Non-Goal; this slice only wires a ready-made algorithm onto kept cards. Sequenced before browse/manual-create so the Success Criteria session is complete before collection extras.
@@ -151,7 +152,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** manual-card-create
 - **PRD refs:** US-01, FR-006
 - **Prerequisites:** S-01
-- **Parallel with:** S-02, S-03, S-04, S-06
+- **Parallel with:** S-02, S-03, S-04, S-06, S-07
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Required, but not on the paste-generate-review path. Sequenced after the first session because the goal is speed; it still depends only on the card shape from S-01.
@@ -165,10 +166,24 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Change ID:** browse-flashcards
 - **PRD refs:** FR-007
 - **Prerequisites:** S-01
-- **Parallel with:** S-02, S-03, S-04, S-05
+- **Parallel with:** S-02, S-03, S-04, S-05, S-07
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Required, but the first session is a review queue, not a card catalog. Sequenced last so speed does not spend the first proving story on a browse-all surface.
+- **Status:** in-progress
+
+
+
+### S-07: Add an OpenRouter API key
+
+- **Outcome:** user can add, replace, or remove their OpenRouter API key on their account; generate uses that key only (no operator env fallback); another account never sees the hint or uses the key.
+- **Change ID:** user-openrouter-key
+- **PRD refs:** — (new requirement; not in PRD v1)
+- **Prerequisites:** S-02
+- **Parallel with:** S-01, S-03, S-04, S-05, S-06
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** After this ships, the first session needs a Settings hop before paste-generate. A lost wrapping secret makes every stored key unreadable. Ciphertext is selectable by the owner JWT and must stay AES-GCM wrapped.
 - **Status:** in-progress
 
 
@@ -184,13 +199,14 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 | S-04       | srs-review-session         | Review kept cards with a ready-made SRS                | no                    | Waits on S-03                                        |
 | S-05       | manual-card-create         | Create a flashcard by hand                             | no                    | Waits on S-01; not on the first-session path         |
 | S-06       | browse-flashcards          | Browse saved flashcards                                | no                    | Waits on S-01; not on the first-session path         |
+| S-07       | user-openrouter-key        | Save an OpenRouter API key so generate uses that key   | yes                   | Plan at `context/changes/user-openrouter-key/plan.md` |
 
 
 
 
 ## Open Roadmap Questions
 
-None. The PRD Open Questions section is empty, and this milestone did not add a cross-cutting question.
+1. **PRD v1 first-session text does not mention adding an OpenRouter key** — Owner: user. Block: no. S-07 is on the milestone anyway; a later `/10x-prd` pass can add the FR.
 
 ## Parked
 
