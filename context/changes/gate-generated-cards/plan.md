@@ -264,33 +264,33 @@ No new migration. Hosted `flashcards` already has UPDATE/DELETE policies. Rollba
 
 #### Manual
 
-- [x] 1.7 Unauthenticated POST → 401; no row change
-- [x] 1.8 Signed-in `keep` on a `generated` row → 200, `status: "kept"`
-- [x] 1.9 Signed-in `keep` on an already-kept row → 200, still `kept` (idempotent)
-- [x] 1.10 Signed-in `unkeep` on a `kept` row → 200, `status: "generated"`
-- [x] 1.11 Signed-in `edit` on a `generated` row with six non-empty fields → 200, new fields, `status: "kept"`
-- [x] 1.12 Signed-in `edit` on a `kept` row → 200, new fields, still `kept`
-- [x] 1.13 Signed-in `edit` with a blank field → 400; row unchanged
-- [x] 1.14 Signed-in `delete` → 200 `{ id }`; refresh list no longer includes the row
-- [x] 1.15 Signed-in as user B, POST user A’s id → 404; A’s row unchanged
-- [x] 1.16 Unknown UUID → 404
+- [x] 1.7 Unauthenticated POST → 401; no row change — b4b9358
+- [x] 1.8 Signed-in `keep` on a `generated` row → 200, `status: "kept"` — b4b9358
+- [x] 1.9 Signed-in `keep` on an already-kept row → 200, still `kept` (idempotent) — b4b9358
+- [x] 1.10 Signed-in `unkeep` on a `kept` row → 200, `status: "generated"` — b4b9358
+- [x] 1.11 Signed-in `edit` on a `generated` row with six non-empty fields → 200, new fields, `status: "kept"` — b4b9358
+- [x] 1.12 Signed-in `edit` on a `kept` row → 200, new fields, still `kept` — b4b9358
+- [x] 1.13 Signed-in `edit` with a blank field → 400; row unchanged — b4b9358
+- [x] 1.14 Signed-in `delete` → 200 `{ id }`; refresh list no longer includes the row — b4b9358
+- [x] 1.15 Signed-in as user B, POST user A’s id → 404; A’s row unchanged — b4b9358
+- [x] 1.16 Unknown UUID → 404 — b4b9358
 
 ### Phase 2: Dashboard gate UI
 
 #### Automated
 
-- [x] 2.1 `npx astro sync` succeeds
-- [x] 2.2 `npm run lint` succeeds
-- [x] 2.3 `npm run build` succeeds
+- [x] 2.1 `npx astro sync` succeeds — b4b9358
+- [x] 2.2 `npm run lint` succeeds — b4b9358
+- [x] 2.3 `npm run build` succeeds — b4b9358
 
 #### Manual
 
-- [x] 2.4 Each card shows generated or kept; Accept keeps a generated card in one click
-- [x] 2.5 Edit + Save on a generated card updates fields and shows kept
-- [x] 2.6 After accepting 2 of 15, the other 13 stay generated on the list and after refresh
-- [x] 2.7 Edit + Save on a kept card updates fields and stays kept
-- [x] 2.8 Un-keep returns a kept card to generated; Accept / Edit / Delete return
-- [x] 2.9 Delete asks for confirm, then removes the card; refresh does not bring it back
-- [x] 2.10 A second generate’s older generated cards still have Accept / Edit / Delete
-- [x] 2.11 Short actions do not freeze the page; a failed action shows an error on that card
-- [x] 2.12 Signed in as user B, none of user A’s cards appear; B cannot change A’s rows
+- [x] 2.4 Each card shows generated or kept; Accept keeps a generated card in one click — b4b9358
+- [x] 2.5 Edit + Save on a generated card updates fields and shows kept — b4b9358
+- [x] 2.6 After accepting 2 of 15, the other 13 stay generated on the list and after refresh — b4b9358
+- [x] 2.7 Edit + Save on a kept card updates fields and stays kept — b4b9358
+- [x] 2.8 Un-keep returns a kept card to generated; Accept / Edit / Delete return — b4b9358
+- [x] 2.9 Delete asks for confirm, then removes the card; refresh does not bring it back — b4b9358
+- [x] 2.10 A second generate’s older generated cards still have Accept / Edit / Delete — b4b9358
+- [x] 2.11 Short actions do not freeze the page; a failed action shows an error on that card — b4b9358
+- [x] 2.12 Signed in as user B, none of user A’s cards appear; B cannot change A’s rows — b4b9358
