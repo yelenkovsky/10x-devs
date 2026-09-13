@@ -1,5 +1,6 @@
 ---
 import BrowseFlashcards from "@/components/cards/BrowseFlashcards";
+import Topbar from "@/components/Topbar.astro";
 import Layout from "@/layouts/Layout.astro";
 import { listBrowseFlashcards } from "@/lib/services/list-flashcards";
 import { createClient } from "@/lib/supabase";
@@ -54,40 +55,12 @@ function cardsHref(nextStatus: BrowseFlashcardStatus): string {
 
 <Layout title="Cards">
   <div class="bg-cosmic min-h-screen p-4 sm:p-8">
+    <Topbar />
     <div class="mx-auto flex max-w-3xl flex-col gap-6">
-      <header
-        class="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/10 p-6 text-white backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
-          <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-            Cards
-          </h1>
-          <p class="mt-2 text-blue-100/80">
-            Welcome, <span class="font-semibold text-white">{user?.email}</span>
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-          <a
-            href="/dashboard"
-            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-          >
-            Dashboard
-          </a>
-          <a
-            href="/review"
-            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-          >
-            Review
-          </a>
-          <form method="POST" action="/api/auth/signout">
-            <button
-              type="submit"
-              class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
+      <header class="rounded-2xl border border-white/10 bg-white/10 p-6 text-white backdrop-blur-xl">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Cards
+        </h1>
       </header>
 
       <nav aria-label="Card status" class="flex flex-wrap gap-2">
