@@ -303,15 +303,15 @@ First product table. Apply locally with the Supabase CLI. Hosted project `10xUsa
 
 #### Automated
 
-- [x] 3.1 `npx astro sync` succeeds
-- [x] 3.2 `npm run lint` succeeds
-- [x] 3.3 `npm run build` succeeds
+- [x] 3.1 `npx astro sync` succeeds — e97ead9
+- [x] 3.2 `npm run lint` succeeds — e97ead9
+- [x] 3.3 `npm run build` succeeds — e97ead9
 
 #### Manual
 
-- [x] 3.4 Empty paste shows explanatory empty-state; the screen does not freeze
-- [x] 3.5 Generate shows the progress panel (status + elapsed) until the batch appears
-- [x] 3.6 Cards show all six fields; refresh still shows them
-- [x] 3.7 A second generate accumulates; a 20-item list shows 15 cards plus the first-15 note
-- [x] 3.8 Typical-use spot-check: one word-list paste and one short-paragraph paste — cards teach context, collocation, and grammar pattern, not C1/C2 showpieces
-- [x] 3.9 Signed in as user B, none of user A’s cards (or paste) appear
+- [x] 3.4 Empty paste shows explanatory empty-state; the screen does not freeze — e97ead9
+- [x] 3.5 Generate shows the progress panel (status + elapsed) until the batch appears — e97ead9
+- [x] 3.6 Cards show all six fields; refresh still shows them — e97ead9
+- [x] 3.7 A second generate accumulates; a 20-item list shows 15 cards plus the first-15 note — e97ead9
+- [x] 3.8 Typical-use spot-check: one word-list paste and one short-paragraph paste — cards teach context, collocation, and grammar pattern, not C1/C2 showpieces — e97ead9
+- [x] 3.9 Signed in as user B, none of user A’s cards (or paste) appear — e97ead9

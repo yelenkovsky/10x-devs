@@ -1,7 +1,7 @@
 ---
 change_id: paste-generate-typical-use
 title: Paste text and generate typical-use cloze cards
-status: implementing
+status: implemented
 created: 2026-09-13
 updated: 2026-09-13
 archived_at: null
