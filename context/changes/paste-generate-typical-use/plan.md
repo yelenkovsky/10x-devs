@@ -271,16 +271,16 @@ First product table. Apply locally with the Supabase CLI. Hosted project `10xUsa
 
 #### Automated
 
-- [x] 1.1 `supabase/migrations/` contains a `create_flashcards` migration that enables RLS and four per-operation `authenticated` policies
-- [x] 1.2 `src/types.ts` exports `Flashcard` and `FlashcardStatus`
-- [x] 1.3 `npx astro sync` succeeds
-- [x] 1.4 `npm run lint` succeeds
-- [x] 1.5 `npm run build` succeeds
+- [x] 1.1 `supabase/migrations/` contains a `create_flashcards` migration that enables RLS and four per-operation `authenticated` policies — ca2a09f
+- [x] 1.2 `src/types.ts` exports `Flashcard` and `FlashcardStatus` — ca2a09f
+- [x] 1.3 `npx astro sync` succeeds — ca2a09f
+- [x] 1.4 `npm run lint` succeeds — ca2a09f
+- [x] 1.5 `npm run build` succeeds — ca2a09f
 
 #### Manual
 
-- [ ] 1.6 Local apply succeeds (`npx supabase db reset` or `npx supabase migration up` against the running local stack)
-- [ ] 1.7 In Studio, `anon` cannot select `flashcards`; a row inserted as user A is not visible when queried as user B
+- [x] 1.6 Local apply succeeds (`npx supabase db reset` or `npx supabase migration up` against the running local stack) — ca2a09f
+- [x] 1.7 In Studio, `anon` cannot select `flashcards`; a row inserted as user A is not visible when queried as user B — ca2a09f
 
 ### Phase 2: Generate API
 
