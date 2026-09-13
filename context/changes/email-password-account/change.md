@@ -1,7 +1,7 @@
 ---
 change_id: email-password-account
 title: Email and password account so cards can bind to a user
-status: planned
+status: implementing
 created: 2026-09-13
 updated: 2026-09-13
 archived_at: null

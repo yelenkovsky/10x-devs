@@ -271,26 +271,26 @@ No database migrations. Hosted Auth stays confirmation-on as in `context/deploym
 
 #### Automated
 
-- [ ] 1.1 `zod` is listed under `dependencies` in `package.json`
-- [ ] 1.2 `npx astro sync` succeeds
-- [ ] 1.3 `npm run lint` succeeds
-- [ ] 1.4 `npm run build` succeeds
+- [x] 1.1 `zod` is listed under `dependencies` in `package.json`
+- [x] 1.2 `npx astro sync` succeeds
+- [x] 1.3 `npm run lint` succeeds
+- [x] 1.4 `npm run build` succeeds
 
 ### Phase 2: Sign-up and sign-in API
 
 #### Automated
 
-- [ ] 2.1 `src/pages/api/auth/signin.ts`, `signup.ts`, and `signout.ts` each export `const prerender = false`
-- [ ] 2.2 `npx astro sync` succeeds
-- [ ] 2.3 `npm run lint` succeeds
-- [ ] 2.4 `npm run build` succeeds
+- [x] 2.1 `src/pages/api/auth/signin.ts`, `signup.ts`, and `signout.ts` each export `const prerender = false`
+- [x] 2.2 `npx astro sync` succeeds
+- [x] 2.3 `npm run lint` succeeds
+- [x] 2.4 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 2.5 With local confirmations off, a new sign-up issues a session and the browser lands on `/dashboard` (or the supplied safe `next`)
-- [ ] 2.6 Signing up again with that same email does not show a “account created / check email” success page; it shows the generic notice on sign-in
-- [ ] 2.7 Wrong password shows mapped copy; the URL does not contain a raw Supabase `error.message`
-- [ ] 2.8 A safe hidden/query `next` is honored; `next=https://example.com`, `next=//evil`, and `next=/%09//evil.com` all land on `/dashboard`
+- [x] 2.5 With local confirmations off, a new sign-up issues a session and the browser lands on `/dashboard` (or the supplied safe `next`)
+- [x] 2.6 Signing up again with that same email does not show a “account created / check email” success page; it shows the generic notice on sign-in
+- [x] 2.7 Wrong password shows mapped copy; the URL does not contain a raw Supabase `error.message`
+- [x] 2.8 A safe hidden/query `next` is honored; `next=https://example.com`, `next=//evil`, and `next=/%09//evil.com` all land on `/dashboard`
 
 ### Phase 3: Middleware, guest contract, and signed-in chrome
 

@@ -1,8 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
+import { DEFAULT_RETURN_PATH, authPageQuery, safeReturnPath } from "@/lib/auth";
 
 const error = Astro.url.searchParams.get("error");
+const notice = Astro.url.searchParams.get("notice");
+const next = safeReturnPath(Astro.url.searchParams.get("next"), Astro.url);
+const nextField = next === DEFAULT_RETURN_PATH ? undefined : next;
+const signinHref = `/auth/signin${authPageQuery({ next })}`;
 ---
 
 <Layout title="Sign up">
@@ -13,9 +18,20 @@ const error = Astro.url.searchParams.get("error");
       >
         Sign up
       </h1>
-      <SignUpForm serverError={error} client:load />
+      {
+        notice && (
+          <p
+            class="mb-4 rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80"
+            role="status"
+          >
+            {notice}
+          </p>
+        )
+      }
+      <SignUpForm serverError={error} next={nextField} client:load />
       <p class="mt-4 text-center text-sm text-blue-100/60">
-        Already have an account? <a href="/auth/signin" class="text-purple-300 hover:underline">Sign in</a>
+        Already have an account?{" "}
+        <a href={signinHref} class="text-purple-300 hover:underline">Sign in</a>
       </p>
     </div>
   </div>

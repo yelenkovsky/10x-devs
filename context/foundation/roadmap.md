@@ -43,7 +43,7 @@ The north star — the smallest end-to-end slice whose successful delivery would
 | ID   | Change ID                  | Outcome (user can …)                                                             | Prerequisites | PRD refs                              | Status   |
 | ---- | -------------------------- | -------------------------------------------------------------------------------- | ------------- | ------------------------------------- | -------- |
 | S-01 | paste-generate-typical-use | paste a word list or short text and get typical-use cloze cards on their account | —             | US-01, FR-002, FR-003, FR-004, FR-009 | ready    |
-| S-02 | email-password-account     | create an account with email and password and sign in                            | —             | US-02, FR-001, FR-010                 | planning |
+| S-02 | email-password-account     | create an account with email and password and sign in                            | —             | US-02, FR-001, FR-010                 | in-progress |
 | S-03 | gate-generated-cards       | accept, edit, or delete a generated flashcard                                    | S-01          | US-01, FR-005                         | proposed |
 | S-04 | srs-review-session         | review their flashcards with a ready-made spaced-repetition algorithm            | S-03          | US-01, FR-008                         | proposed |
 | S-05 | manual-card-create         | create a flashcard by hand with the same fields as generated cards               | S-01          | US-01, FR-006                         | proposed |
@@ -113,7 +113,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Auth is already present in the baseline; this slice exists so US-02 stays on the roadmap and any remaining gaps (unauthenticated visitors keeping a deck) get closed. It is not a reason to defer S-01.
-- **Status:** planning
+- **Status:** in-progress
 
 
 
