@@ -286,18 +286,18 @@ First product table. Apply locally with the Supabase CLI. Hosted project `10xUsa
 
 #### Automated
 
-- [x] 2.1 `src/pages/api/cards/generate.ts` exports `const prerender = false`
-- [x] 2.2 `npx astro sync` succeeds
-- [x] 2.3 `npm run lint` succeeds
-- [x] 2.4 `npm run build` succeeds
+- [x] 2.1 `src/pages/api/cards/generate.ts` exports `const prerender = false` — da61015
+- [x] 2.2 `npx astro sync` succeeds — da61015
+- [x] 2.3 `npm run lint` succeeds — da61015
+- [x] 2.4 `npm run build` succeeds — da61015
 
 #### Manual
 
-- [x] 2.5 Unauthenticated POST → 401; no rows inserted
-- [x] 2.6 Signed-in POST of `"   "` → 400 `empty_paste`; no rows
-- [x] 2.7 Signed-in POST of 4001 characters → 400 `paste_too_long`; no rows
-- [x] 2.8 Signed-in POST of a 3-word list → 200, three `generated` rows for that user only, six fields each
-- [x] 2.9 A mixed/invalid card from the model is omitted from the table and counted in `failedCount`
+- [x] 2.5 Unauthenticated POST → 401; no rows inserted — da61015
+- [x] 2.6 Signed-in POST of `"   "` → 400 `empty_paste`; no rows — da61015
+- [x] 2.7 Signed-in POST of 4001 characters → 400 `paste_too_long`; no rows — da61015
+- [x] 2.8 Signed-in POST of a 3-word list → 200, three `generated` rows for that user only, six fields each — da61015
+- [x] 2.9 A mixed/invalid card from the model is omitted from the table and counted in `failedCount` — da61015
 
 ### Phase 3: Dashboard paste and results
 
