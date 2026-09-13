@@ -298,13 +298,13 @@ New table; no backfill. Existing accounts have no key and cannot generate until 
 
 #### Automated
 
-- [x] 1.1 `supabase/migrations/` contains a `create_user_openrouter_keys` migration that enables RLS and four per-operation `authenticated` policies
-- [x] 1.2 `USER_SECRETS_KEY` is declared in `astro.config.mjs`; `OPENROUTER_API_KEY` is not
-- [x] 1.3 Unit tests cover hex-key import, encrypt/decrypt round-trip, prefix reject (`###`, empty, interior space), and last-4
-- [x] 1.4 `npm test` succeeds
-- [x] 1.5 `npx astro sync` succeeds
-- [x] 1.6 `npm run lint` succeeds
-- [x] 1.7 `npm run build` succeeds
+- [x] 1.1 `supabase/migrations/` contains a `create_user_openrouter_keys` migration that enables RLS and four per-operation `authenticated` policies — baf7eeb
+- [x] 1.2 `USER_SECRETS_KEY` is declared in `astro.config.mjs`; `OPENROUTER_API_KEY` is not — baf7eeb
+- [x] 1.3 Unit tests cover hex-key import, encrypt/decrypt round-trip, prefix reject (`###`, empty, interior space), and last-4 — baf7eeb
+- [x] 1.4 `npm test` succeeds — baf7eeb
+- [x] 1.5 `npx astro sync` succeeds — baf7eeb
+- [x] 1.6 `npm run lint` succeeds — baf7eeb
+- [x] 1.7 `npm run build` succeeds — baf7eeb
 
 #### Manual
 
