@@ -296,14 +296,14 @@ No database migrations. Hosted Auth stays confirmation-on as in `context/deploym
 
 #### Automated
 
-- [ ] 3.1 `npx astro sync` succeeds
-- [ ] 3.2 `npm run lint` succeeds
-- [ ] 3.3 `npm run build` succeeds
+- [x] 3.1 `npx astro sync` succeeds
+- [x] 3.2 `npm run lint` succeeds
+- [x] 3.3 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 3.4 Unauthenticated `/dashboard` redirects to exactly `/auth/signin?next=%2Fdashboard` — assert on that URL, because `/dashboard` is also the fallback and a broken `next` would still land correctly — and signing in from there returns to `/dashboard`
-- [ ] 3.5 Signed-in `/auth/signin` and `/auth/signup` redirect to `/dashboard` without showing the forms
-- [ ] 3.6 Signed-in home hero does not use Sign In / Sign Up as the primary pair; guest home still does
-- [ ] 3.7 Sign out returns to `/` and `/dashboard` is guarded again
-- [ ] 3.8 Opening `/auth/confirm-email` while signed in goes to `/dashboard`; while signed out shows check-email copy (not DEV-based “you can now sign in” in production builds)
+- [x] 3.4 Unauthenticated `/dashboard` redirects to exactly `/auth/signin?next=%2Fdashboard` — assert on that URL, because `/dashboard` is also the fallback and a broken `next` would still land correctly — and signing in from there returns to `/dashboard`
+- [x] 3.5 Signed-in `/auth/signin` and `/auth/signup` redirect to `/dashboard` without showing the forms
+- [x] 3.6 Signed-in home hero does not use Sign In / Sign Up as the primary pair; guest home still does
+- [x] 3.7 Sign out returns to `/` and `/dashboard` is guarded again
+- [x] 3.8 Opening `/auth/confirm-email` while signed in goes to `/dashboard`; while signed out shows check-email copy (not DEV-based “you can now sign in” in production builds)

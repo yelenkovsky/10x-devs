@@ -3,6 +3,10 @@ import Layout from "@/layouts/Layout.astro";
 import SignInForm from "@/components/auth/SignInForm";
 import { DEFAULT_RETURN_PATH, authPageQuery, safeReturnPath } from "@/lib/auth";
 
+if (Astro.locals.user) {
+  return Astro.redirect(safeReturnPath(Astro.url.searchParams.get("next"), Astro.url));
+}
+
 const error = Astro.url.searchParams.get("error");
 const notice = Astro.url.searchParams.get("notice");
 const next = safeReturnPath(Astro.url.searchParams.get("next"), Astro.url);

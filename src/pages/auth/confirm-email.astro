@@ -1,9 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 
-const isAutoConfirmed = import.meta.env.DEV;
+if (Astro.locals.user) {
+  return Astro.redirect("/dashboard");
+}
 
-const content = isAutoConfirmed
+const confirmed = Astro.url.searchParams.has("code");
+
+const content = confirmed
   ? {
       emoji: "✅",
       heading: "Registration successful",
