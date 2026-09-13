@@ -1,7 +1,7 @@
 ---
 change_id: manual-card-create
 title: Create a flashcard by hand
-status: implemented
+status: impl_reviewed
 created: 2026-09-13
 updated: 2026-09-13
 archived_at: null

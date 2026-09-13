@@ -118,6 +118,10 @@ export function CreateFlashcard({ onCreated }: CreateFlashcardProps) {
   }
 
   function handleSave() {
+    if (isPending) {
+      return;
+    }
+
     const nextErrors: FieldErrors = {};
     const trimmed = {} as CreateDraft;
 
