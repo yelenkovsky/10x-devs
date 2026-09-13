@@ -20,3 +20,25 @@ export interface GenerateCardsResponse {
   truncated: boolean;
   cap: number;
 }
+
+export type MutateFlashcardRequest =
+  | { action: "keep" }
+  | { action: "unkeep" }
+  | { action: "delete" }
+  | {
+      action: "edit";
+      cloze: string;
+      wordPhrase: string;
+      fullSentence: string;
+      definition: string;
+      collocationPattern: string;
+      translationPl: string;
+    };
+
+export interface MutateFlashcardCardResponse {
+  card: Flashcard;
+}
+
+export interface MutateFlashcardDeleteResponse {
+  id: string;
+}

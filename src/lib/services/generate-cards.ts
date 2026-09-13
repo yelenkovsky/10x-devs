@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { OPENROUTER_API_KEY, OPENROUTER_MODEL } from "astro:env/server";
 import { z } from "zod";
+import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
 import type { Flashcard, GenerateCardsResponse } from "@/types";
 
 export const CARD_CAP = 15;
@@ -45,20 +46,6 @@ const openRouterResponseSchema = z.object({
       }),
     )
     .min(1),
-});
-
-const flashcardRowSchema = z.object({
-  id: z.string(),
-  user_id: z.string(),
-  generation_id: z.string(),
-  status: z.enum(["generated", "kept"]),
-  cloze: z.string(),
-  word_phrase: z.string(),
-  full_sentence: z.string(),
-  definition: z.string(),
-  collocation_pattern: z.string(),
-  translation_pl: z.string(),
-  created_at: z.string(),
 });
 
 const cardJsonSchema = {
@@ -246,7 +233,7 @@ async function persistValidCards(
     translation_pl: card.translationPl,
   }));
 
-  const { data, error } = await supabase.from("flashcards").insert(rows).select();
+  const { data, error } = await supabase.from("flashcards").insert(rows).select(FLASHCARD_COLUMNS);
   if (error) {
     throw unavailable();
   }
@@ -257,20 +244,4 @@ async function persistValidCards(
   }
 
   return parsedRows.data.map(toFlashcard);
-}
-
-function toFlashcard(row: z.infer<typeof flashcardRowSchema>): Flashcard {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    generationId: row.generation_id,
-    status: row.status,
-    cloze: row.cloze,
-    wordPhrase: row.word_phrase,
-    fullSentence: row.full_sentence,
-    definition: row.definition,
-    collocationPattern: row.collocation_pattern,
-    translationPl: row.translation_pl,
-    createdAt: row.created_at,
-  };
 }
