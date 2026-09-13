@@ -255,12 +255,12 @@ No new migration. Hosted `flashcards` already has UPDATE/DELETE policies. Rollba
 
 #### Automated
 
-- [x] 1.1 `src/pages/api/cards/[id].ts` exports `const prerender = false` and `POST`
-- [x] 1.2 `src/types.ts` exports `MutateFlashcardRequest`
-- [x] 1.3 Generate and list import the shared row mapper (no third private copy of `toFlashcard`)
-- [x] 1.4 `npx astro sync` succeeds
-- [x] 1.5 `npm run lint` succeeds
-- [x] 1.6 `npm run build` succeeds
+- [x] 1.1 `src/pages/api/cards/[id].ts` exports `const prerender = false` and `POST` — 1cfa6c6
+- [x] 1.2 `src/types.ts` exports `MutateFlashcardRequest` — 1cfa6c6
+- [x] 1.3 Generate and list import the shared row mapper (no third private copy of `toFlashcard`) — 1cfa6c6
+- [x] 1.4 `npx astro sync` succeeds — 1cfa6c6
+- [x] 1.5 `npm run lint` succeeds — 1cfa6c6
+- [x] 1.6 `npm run build` succeeds — 1cfa6c6
 
 #### Manual
 
