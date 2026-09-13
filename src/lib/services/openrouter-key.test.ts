@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { openRouterKeyLast4, parseOpenRouterApiKey, toOpenRouterKeyStatus } from "@/lib/services/openrouter-key";
+import {
+  deleteOpenRouterKey,
+  loadOpenRouterKeyHint,
+  openRouterKeyLast4,
+  parseOpenRouterApiKey,
+  saveOpenRouterKey,
+  toOpenRouterKeyStatus,
+} from "@/lib/services/openrouter-key";
+import { createUserOpenRouterKeyStore } from "@/test/user-openrouter-key-store";
 
 // Test fixture only — not a live OpenRouter key. Do not commit a full `sk-or-v1-` + 64-hex
 // literal; GitHub push protection treats that pattern as a real secret.
@@ -32,5 +40,49 @@ describe("toOpenRouterKeyStatus", () => {
   it("maps a hint row to last-4 without needing ciphertext", () => {
     expect(toOpenRouterKeyStatus({ last4: "cdef" })).toEqual({ configured: true, last4: "cdef" });
     expect(toOpenRouterKeyStatus(null)).toEqual({ configured: false });
+  });
+});
+
+describe("save, replace, delete, and isolation", () => {
+  const wrappingKey = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+  const userA = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const userB = "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb";
+  const keyA = `sk-or-v1-${"a".repeat(64)}`;
+  const keyB = `sk-or-v1-${"b".repeat(64)}`;
+
+  it("replaces last-4, delete clears the row, and A cannot read B's last4", async () => {
+    const store = createUserOpenRouterKeyStore();
+
+    await saveOpenRouterKey({
+      userId: userA,
+      apiKey: keyA,
+      wrappingKey,
+      supabase: store.clientFor(userA),
+    });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "aaaa" });
+
+    await saveOpenRouterKey({
+      userId: userA,
+      apiKey: keyB,
+      wrappingKey,
+      supabase: store.clientFor(userA),
+    });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "bbbb" });
+    expect(store.rows.size).toBe(1);
+
+    await saveOpenRouterKey({
+      userId: userB,
+      apiKey: keyA,
+      wrappingKey,
+      supabase: store.clientFor(userB),
+    });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: true, last4: "bbbb" });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userB))).toEqual({ configured: true, last4: "aaaa" });
+
+    expect(await deleteOpenRouterKey({ userId: userA, supabase: store.clientFor(userA) })).toEqual({
+      configured: false,
+    });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userA))).toEqual({ configured: false });
+    expect(await loadOpenRouterKeyHint(store.clientFor(userB))).toEqual({ configured: true, last4: "aaaa" });
   });
 });

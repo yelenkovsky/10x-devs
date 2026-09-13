@@ -1,14 +1,9 @@
 ---
+import { productLinks } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const { user } = Astro.locals;
 const pathname = Astro.url.pathname;
-
-const productLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/cards", label: "Cards" },
-  { href: "/review", label: "Review" },
-] as const;
 ---
 
 <div
