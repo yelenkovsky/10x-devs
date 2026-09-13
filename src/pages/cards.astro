@@ -1,0 +1,141 @@
+---
+import BrowseFlashcards from "@/components/cards/BrowseFlashcards";
+import Layout from "@/layouts/Layout.astro";
+import { listBrowseFlashcards } from "@/lib/services/list-flashcards";
+import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
+import type { BrowseFlashcardStatus, Flashcard } from "@/types";
+
+const { user } = Astro.locals;
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+const rawStatus = Astro.url.searchParams.get("status");
+const status: BrowseFlashcardStatus = rawStatus === "generated" || rawStatus === "kept" ? rawStatus : "all";
+const q = Astro.url.searchParams.get("q")?.trim() ?? "";
+
+let cards: Flashcard[] = [];
+let capped = false;
+let loadError = !supabase || !user;
+if (supabase && user) {
+  try {
+    const result = await listBrowseFlashcards({
+      supabase,
+      userId: user.id,
+      status,
+      q,
+    });
+    cards = result.cards;
+    capped = result.capped;
+  } catch {
+    loadError = true;
+    cards = [];
+    capped = false;
+  }
+}
+
+const chips = [
+  { value: "all" as const, label: "All" },
+  { value: "generated" as const, label: "Generated" },
+  { value: "kept" as const, label: "Kept" },
+];
+
+function cardsHref(nextStatus: BrowseFlashcardStatus): string {
+  const params = new URLSearchParams();
+  if (nextStatus === "generated" || nextStatus === "kept") {
+    params.set("status", nextStatus);
+  }
+  if (q.length > 0) {
+    params.set("q", q);
+  }
+  const query = params.toString();
+  return query ? `/cards?${query}` : "/cards";
+}
+---
+
+<Layout title="Cards">
+  <div class="bg-cosmic min-h-screen p-4 sm:p-8">
+    <div class="mx-auto flex max-w-3xl flex-col gap-6">
+      <header
+        class="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/10 p-6 text-white backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div>
+          <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+            Cards
+          </h1>
+          <p class="mt-2 text-blue-100/80">
+            Welcome, <span class="font-semibold text-white">{user?.email}</span>
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <a
+            href="/dashboard"
+            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+          >
+            Dashboard
+          </a>
+          <a
+            href="/review"
+            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+          >
+            Review
+          </a>
+          <form method="POST" action="/api/auth/signout">
+            <button
+              type="submit"
+              class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <nav aria-label="Card status" class="flex flex-wrap gap-2">
+        {
+          chips.map((chip) => {
+            const isCurrent = chip.value === status;
+            return (
+              <a
+                href={cardsHref(chip.value)}
+                aria-current={isCurrent ? "page" : undefined}
+                class:list={[
+                  cn(
+                    "rounded-lg border px-4 py-2 text-sm transition-colors",
+                    isCurrent
+                      ? "border-white/40 bg-white/20 text-white"
+                      : "border-white/20 bg-white/10 text-blue-100/80 hover:bg-white/20",
+                  ),
+                ]}
+              >
+                {chip.label}
+              </a>
+            );
+          })
+        }
+      </nav>
+
+      <form method="GET" action="/cards" class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {status !== "all" ? <input type="hidden" name="status" value={status} /> : null}
+        <div class="min-w-0 flex-1">
+          <label for="q" class="mb-1 block text-sm text-blue-100/80"> Find a word or phrase </label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            value={q}
+            placeholder="word or phrase"
+            class="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-white placeholder-white/40 transition-colors focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          />
+        </div>
+        <button
+          type="submit"
+          class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+        >
+          Find
+        </button>
+      </form>
+
+      <BrowseFlashcards cards={cards} capped={capped} loadError={loadError} status={status} q={q} client:load />
+    </div>
+  </div>
+</Layout>

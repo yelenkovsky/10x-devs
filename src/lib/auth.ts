@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const PROTECTED_ROUTES = ["/dashboard", "/review"] as const;
+export const PROTECTED_ROUTES = ["/dashboard", "/review", "/cards"] as const;
 
 export const DEFAULT_RETURN_PATH = "/dashboard";
 

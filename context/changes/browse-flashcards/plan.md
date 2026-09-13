@@ -290,13 +290,13 @@ No new migration. Hosted `flashcards` already has owner SELECT and `(user_id, cr
 
 #### Automated
 
-- [ ] 2.1 `src/pages/cards.astro` exists and hydrates a `client:load` browse island
-- [ ] 2.2 `PROTECTED_ROUTES` includes `/cards`
-- [ ] 2.3 Filter chrome (status chips + word/phrase find) lives on `/cards`, not `/dashboard`
-- [ ] 2.4 Paste-generate and hand-create remain on `/dashboard` only
-- [ ] 2.5 `npx astro sync` succeeds
-- [ ] 2.6 `npm run lint` succeeds
-- [ ] 2.7 `npm run build` succeeds
+- [x] 2.1 `src/pages/cards.astro` exists and hydrates a `client:load` browse island
+- [x] 2.2 `PROTECTED_ROUTES` includes `/cards`
+- [x] 2.3 Filter chrome (status chips + word/phrase find) lives on `/cards`, not `/dashboard`
+- [x] 2.4 Paste-generate and hand-create remain on `/dashboard` only
+- [x] 2.5 `npx astro sync` succeeds
+- [x] 2.6 `npm run lint` succeeds
+- [x] 2.7 `npm run build` succeeds
 
 #### Manual
 
