@@ -450,9 +450,9 @@ No schema migration. No product behavior change. Existing local DBs already have
 
 #### Automated
 
-- [ ] 2.1 Hook tests pass under jsdom + fake timers
-- [ ] 2.2 PasteGenerate in-flight + no-prepend tests pass
-- [ ] 2.3 `npm test` and `npm run lint` pass
+- [x] 2.1 Hook tests pass under jsdom + fake timers
+- [x] 2.2 PasteGenerate in-flight + no-prepend tests pass
+- [x] 2.3 `npm test` and `npm run lint` pass
 
 #### Manual
 
