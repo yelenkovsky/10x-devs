@@ -51,7 +51,7 @@ Keep the cookie session and the existing table. Add a browse query that filters 
 
 ### Timing & lifecycle
 
-Apply status and word/phrase filters **before** the 1000-row cap. Fetch `cap + 1` rows, return the first `cap`, and set `capped` only when the extra row exists. Do not treat `length === 1000` as “there might be more” — that false-positives an exact 1000. Never client-filter a newest-1000 dump.
+Apply status and word/phrase filters **before** the 1000-row cap. Select with `{ count: "exact" }` and `.limit(1000)`; set `capped` from `count > 1000`. Throw if `count` is null (cannot attest the cap). Do not treat `length === 1000` as “there might be more” — that false-positives an exact 1000, and PostgREST `max_rows` would hide a 1001st payload row anyway. Never client-filter a newest-1000 dump.
 
 ### User experience spec
 
@@ -81,7 +81,9 @@ Give inbox and catalog one stable newest-first order, and give browse a filtered
 
 **Intent**: Catalog load is “matching rows, newest 1000, say if more exist” — not “newest 1000, then hope the chip still finds leftovers.”
 
-**Contract**: Export a browse result `{ cards: Flashcard[]; capped: boolean }` and a status filter `"all" | "generated" | "kept"`. Input includes `supabase`, `userId` (from `locals.user.id` only), `status`, and trimmed `q`. Always `.eq("user_id", userId)`. When `status` is `generated` or `kept`, `.eq("status", status)`; `all` adds no status predicate. When `q` is non-empty after trim, case-insensitive contains on `word_phrase` only; treat `%` and `_` in `q` as literals (escape them). Order `created_at` desc, `id` desc. `BROWSE_CARD_CAP = 1000`. `.limit(1001)`; if 1001 rows return, set `capped: true` and drop the extra row; otherwise `capped: false`. Same parse/skip/throw rules as the inbox list. Do not select FSRS. Do not log `q` or card fields.
+**Contract**: Export a browse result `{ cards: Flashcard[]; capped: boolean }` and a status filter `"all" | "generated" | "kept"`. Input includes `supabase`, `userId` (from `locals.user.id` only), `status`, and trimmed `q`. Always `.eq("user_id", userId)`. When `status` is `generated` or `kept`, `.eq("status", status)`; `all` adds no status predicate. When `q` is non-empty after trim, case-insensitive contains on `word_phrase` only; treat `%` and `_` in `q` as literals (escape them). Order `created_at` desc, `id` desc. `BROWSE_CARD_CAP = 1000`. `.select(..., { count: "exact" })` and `.limit(1000)`; set `capped` from `count > 1000`. Throw if `count` is null (cannot attest the cap). Do not use a 1001st payload row — PostgREST `max_rows` is 1000 and would strip it. Same parse/skip/throw rules as the inbox list. Do not select FSRS. Do not log `q` or card fields.
+
+**Addendum (impl-review 2026-09-13):** Cap detection uses exact count, not `.limit(1001)` + drop-the-extra-row. The probe row never arrives under `max_rows = 1000`. Honest-cap intent is unchanged: a 1001st match sets `capped: true`; an exact 1000 leaves `capped: false`.
 
 ### Success Criteria:
 
@@ -245,7 +247,7 @@ One signed-in nav for Dashboard, Cards, and Review so browse is reachable from t
 
 ## Performance Considerations
 
-One browse load is one filtered select of at most 1001 rows (`FLASHCARD_COLUMNS` only). `ilike` on `word_phrase` has no index — acceptable at handful-of-users / 1000-row cap. Do not add a `tsvector` or extra status index in this slice. Filter changes are full GET navigations; per-card actions stay one mutate `fetch` with a pending state, no elapsed panel.
+One browse load is one filtered select of at most 1000 rows (`FLASHCARD_COLUMNS` only) plus an exact count on the same filter. `ilike` on `word_phrase` has no index — acceptable at handful-of-users / 1000-row cap. Do not add a `tsvector` or extra status index in this slice. Filter changes are full GET navigations; per-card actions stay one mutate `fetch` with a pending state, no elapsed panel.
 
 ## Migration Notes
 
@@ -301,11 +303,11 @@ No new migration. Hosted `flashcards` already has owner SELECT and `(user_id, cr
 #### Manual
 
 - [ ] 2.8 Guest `/cards` redirects to sign-in with `next` that returns them to `/cards` after sign-in; query string survives when present
-- [ ] 2.9 Default `/cards` is All, newest first; Generated / Kept chips narrow the list; All clears the status predicate
-- [ ] 2.10 Find matches `word_phrase` case-insensitively; a definition-only hit does not appear; empty find shows the unfiltered (or status-only) list
-- [ ] 2.11 Empty deck copy points at the dashboard; a chip or find with no matches is distinct from empty deck and from `loadError`
+- [x] 2.9 Default `/cards` is All, newest first; Generated / Kept chips narrow the list; All clears the status predicate — 63d3950
+- [x] 2.10 Find matches `word_phrase` case-insensitively; a definition-only hit does not appear; empty find shows the unfiltered (or status-only) list — 63d3950
+- [x] 2.11 Empty deck copy points at the dashboard; a chip or find with no matches is distinct from empty deck and from `loadError` — 63d3950
 - [ ] 2.12 Cap note appears only when more matching rows exist than 1000
-- [ ] 2.13 Accept / Edit / Delete / Un-keep on `/cards` match the inbox; refresh keeps the new status or absence
+- [x] 2.13 Accept / Edit / Delete / Un-keep on `/cards` match the inbox; refresh keeps the new status or absence — 63d3950
 - [ ] 2.14 Short actions do not freeze the page; a failed action shows an error on that card
 - [ ] 2.15 Signed in as user B, none of user A’s cards appear; B cannot mutate A’s rows
 
@@ -322,9 +324,9 @@ No new migration. Hosted `flashcards` already has owner SELECT and `(user_id, cr
 
 #### Manual
 
-- [ ] 3.7 From `/`, `/dashboard`, `/cards`, and `/review` (signed in), each of Dashboard / Cards / Review lands on the right page
-- [ ] 3.8 The current page’s Topbar link is indicated (`aria-current`)
-- [ ] 3.9 Guest home still shows Sign in / Sign up, not the product trio
-- [ ] 3.10 Sign out still clears the session from Topbar
-- [ ] 3.11 Guest `/cards` still redirects to sign-in
-- [ ] 3.12 Email and Sign out appear once per product page, not in both Topbar and the title card
+- [x] 3.7 From `/`, `/dashboard`, `/cards`, and `/review` (signed in), each of Dashboard / Cards / Review lands on the right page — 60015c0
+- [x] 3.8 The current page’s Topbar link is indicated (`aria-current`) — 60015c0
+- [x] 3.9 Guest home still shows Sign in / Sign up, not the product trio — 60015c0
+- [x] 3.10 Sign out still clears the session from Topbar — 60015c0
+- [x] 3.11 Guest `/cards` still redirects to sign-in — 60015c0
+- [x] 3.12 Email and Sign out appear once per product page, not in both Topbar and the title card — 60015c0

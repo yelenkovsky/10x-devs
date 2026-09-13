@@ -51,7 +51,10 @@ export async function listFlashcards(supabase: SupabaseClient): Promise<Flashcar
 
 export async function listBrowseFlashcards(input: ListBrowseFlashcardsInput): Promise<BrowseFlashcardsResult> {
   const q = input.q.trim();
-  let query = input.supabase.from("flashcards").select(FLASHCARD_COLUMNS).eq("user_id", input.userId);
+  let query = input.supabase
+    .from("flashcards")
+    .select(FLASHCARD_COLUMNS, { count: "exact" })
+    .eq("user_id", input.userId);
 
   if (input.status === "generated" || input.status === "kept") {
     query = query.eq("status", input.status);
@@ -61,20 +64,17 @@ export async function listBrowseFlashcards(input: ListBrowseFlashcardsInput): Pr
     query = query.ilike("word_phrase", `%${escapeIlikeLiteral(q)}%`);
   }
 
-  const { data, error } = await query
+  const { data, error, count } = await query
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
-    .limit(BROWSE_CARD_CAP + 1);
+    .limit(BROWSE_CARD_CAP);
 
-  if (error) {
+  if (error || count === null) {
     throw new Error("Failed to load flashcards.");
   }
 
-  const capped = Array.isArray(data) && data.length > BROWSE_CARD_CAP;
-  const rows = capped ? data.slice(0, BROWSE_CARD_CAP) : data;
-
   return {
-    cards: parseFlashcardRows(rows),
-    capped,
+    cards: parseFlashcardRows(data),
+    capped: count > BROWSE_CARD_CAP,
   };
 }
