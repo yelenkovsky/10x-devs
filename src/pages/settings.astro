@@ -1,0 +1,33 @@
+---
+import OpenRouterKeyForm from "@/components/settings/OpenRouterKeyForm";
+import Topbar from "@/components/Topbar.astro";
+import Layout from "@/layouts/Layout.astro";
+import { loadOpenRouterKeyHint } from "@/lib/services/openrouter-key";
+import { createClient } from "@/lib/supabase";
+import type { OpenRouterKeyStatus } from "@/types";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+let keyStatus: OpenRouterKeyStatus = { configured: false };
+let loadError = !supabase;
+if (supabase) {
+  try {
+    keyStatus = await loadOpenRouterKeyHint(supabase);
+  } catch {
+    loadError = true;
+  }
+}
+---
+
+<Layout title="Settings">
+  <div class="bg-cosmic min-h-screen p-4 sm:p-8">
+    <Topbar />
+    <div class="mx-auto flex max-w-3xl flex-col gap-6">
+      <header class="rounded-2xl border border-white/10 bg-white/10 p-6 text-white backdrop-blur-xl">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Settings
+        </h1>
+      </header>
+      <OpenRouterKeyForm initialStatus={keyStatus} loadError={loadError} client:load />
+    </div>
+  </div>
+</Layout>

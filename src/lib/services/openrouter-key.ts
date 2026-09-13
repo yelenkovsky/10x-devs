@@ -1,5 +1,25 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { encryptSecret } from "@/lib/services/user-secrets";
 import type { OpenRouterKeyStatus } from "@/types";
+
+export class OpenRouterKeyError extends Error {
+  readonly status: number;
+  readonly code: string;
+
+  constructor(code: string, message: string, status: number) {
+    super(message);
+    this.name = "OpenRouterKeyError";
+    this.code = code;
+    this.status = status;
+  }
+}
+
+const INVALID_KEY_FORMAT_MESSAGE = "Enter an OpenRouter API key that starts with sk-or-.";
+
+function unavailable(message: string): OpenRouterKeyError {
+  return new OpenRouterKeyError("key_unavailable", message, 503);
+}
 
 export const USER_OPENROUTER_KEY_COLUMNS = "user_id, nonce, ciphertext, last4, created_at, updated_at";
 
@@ -40,4 +60,73 @@ export function toOpenRouterKeyStatus(row: UserOpenRouterKeyHintRow | null | und
     return { configured: false };
   }
   return { configured: true, last4: row.last4 };
+}
+
+export async function loadOpenRouterKeyHint(supabase: SupabaseClient): Promise<OpenRouterKeyStatus> {
+  const { data, error } = await supabase
+    .from("user_openrouter_keys")
+    .select(USER_OPENROUTER_KEY_HINT_COLUMNS)
+    .maybeSingle();
+
+  if (error) {
+    throw unavailable("Could not load the API key status. Try again.");
+  }
+
+  if (!data) {
+    return toOpenRouterKeyStatus(null);
+  }
+
+  const parsed = userOpenRouterKeyHintRowSchema.safeParse(data);
+  if (!parsed.success) {
+    throw unavailable("Could not load the API key status. Try again.");
+  }
+
+  return toOpenRouterKeyStatus(parsed.data);
+}
+
+export interface SaveOpenRouterKeyInput {
+  userId: string;
+  apiKey: string;
+  wrappingKey: string | undefined;
+  supabase: SupabaseClient;
+}
+
+export async function saveOpenRouterKey(input: SaveOpenRouterKeyInput): Promise<OpenRouterKeyStatus> {
+  const parsed = parseOpenRouterApiKey(input.apiKey);
+  if (!parsed.ok) {
+    throw new OpenRouterKeyError("invalid_key_format", INVALID_KEY_FORMAT_MESSAGE, 400);
+  }
+
+  const sealed = await encryptSecret(parsed.apiKey, input.wrappingKey);
+  const { error } = await input.supabase.from("user_openrouter_keys").upsert(
+    {
+      user_id: input.userId,
+      nonce: sealed.nonce,
+      ciphertext: sealed.ciphertext,
+      last4: parsed.last4,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
+
+  if (error) {
+    throw unavailable("Could not save the API key. Try again.");
+  }
+
+  return { configured: true, last4: parsed.last4 };
+}
+
+export interface DeleteOpenRouterKeyInput {
+  userId: string;
+  supabase: SupabaseClient;
+}
+
+export async function deleteOpenRouterKey(input: DeleteOpenRouterKeyInput): Promise<OpenRouterKeyStatus> {
+  const { error } = await input.supabase.from("user_openrouter_keys").delete().eq("user_id", input.userId);
+
+  if (error) {
+    throw unavailable("Could not remove the API key. Try again.");
+  }
+
+  return { configured: false };
 }

@@ -315,13 +315,13 @@ New table; no backfill. Existing accounts have no key and cannot generate until 
 
 #### Automated
 
-- [ ] 2.1 `src/pages/api/settings/openrouter-key.ts` exports `const prerender = false`
-- [ ] 2.2 `/settings` is listed in `PROTECTED_ROUTES` and `productLinks`
-- [ ] 2.3 Tests cover 401 guest POST/DELETE, `invalid_key_format` for `###` / empty, replace updates last-4, delete clears the row, and user A’s client cannot read user B’s `last4`
-- [ ] 2.4 `npm test` succeeds
-- [ ] 2.5 `npx astro sync` succeeds
-- [ ] 2.6 `npm run lint` succeeds
-- [ ] 2.7 `npm run build` succeeds
+- [x] 2.1 `src/pages/api/settings/openrouter-key.ts` exports `const prerender = false`
+- [x] 2.2 `/settings` is listed in `PROTECTED_ROUTES` and `productLinks`
+- [x] 2.3 Tests cover 401 guest POST/DELETE, `invalid_key_format` for `###` / empty, replace updates last-4, delete clears the row, and user A’s client cannot read user B’s `last4`
+- [x] 2.4 `npm test` succeeds
+- [x] 2.5 `npx astro sync` succeeds
+- [x] 2.6 `npm run lint` succeeds
+- [x] 2.7 `npm run build` succeeds
 
 #### Manual
 
