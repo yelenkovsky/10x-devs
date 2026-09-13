@@ -292,15 +292,15 @@ S-05 insert-as-kept can stay lazy: null FSRS until first grade. Do not invent a 
 
 #### Automated
 
-- [x] 1.1 New migration from `npx supabase migration new add_flashcard_fsrs` adds the nullable FSRS columns and queue index; it applies locally
-- [x] 1.2 `ts-fsrs` is a runtime dependency in `package.json`
-- [x] 1.3 `src/pages/api/review.ts` exports `const prerender = false`, `GET`, and `POST`
-- [x] 1.4 `src/types.ts` exports the review session request and response types
-- [x] 1.5 `FLASHCARD_COLUMNS` and the dashboard `Flashcard` type stay content-only (no FSRS fields)
-- [x] 1.6 Un-keep UPDATE nulls FSRS columns in the same write as `status: "generated"`
-- [x] 1.7 `npx astro sync` succeeds
-- [x] 1.8 `npm run lint` succeeds
-- [x] 1.9 `npm run build` succeeds
+- [x] 1.1 New migration from `npx supabase migration new add_flashcard_fsrs` adds the nullable FSRS columns and queue index; it applies locally — e3cc09a
+- [x] 1.2 `ts-fsrs` is a runtime dependency in `package.json` — e3cc09a
+- [x] 1.3 `src/pages/api/review.ts` exports `const prerender = false`, `GET`, and `POST` — e3cc09a
+- [x] 1.4 `src/types.ts` exports the review session request and response types — e3cc09a
+- [x] 1.5 `FLASHCARD_COLUMNS` and the dashboard `Flashcard` type stay content-only (no FSRS fields) — e3cc09a
+- [x] 1.6 Un-keep UPDATE nulls FSRS columns in the same write as `status: "generated"` — e3cc09a
+- [x] 1.7 `npx astro sync` succeeds — e3cc09a
+- [x] 1.8 `npm run lint` succeeds — e3cc09a
+- [x] 1.9 `npm run build` succeeds — e3cc09a
 
 #### Manual
 
