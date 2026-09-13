@@ -41,9 +41,9 @@ research's job, see §1 principle #3).
 
 | # | Risk (failure scenario) | Impact | Likelihood | Source (evidence — not anchor) |
 |---|-------------------------|--------|------------|--------------------------------|
-| 1 | A signed-in learner sees another account’s cards or pasted input | High | High | PRD guardrails + US-01 AC; roadmap S-01 isolation; hot-spot dirs `src/lib/services` (9 commits/30d), `src/pages/api` (6 commits/30d); abuse: ownership |
-| 2 | Generate/progress works on Node and then hangs, times out, or looks like an empty success on the Worker | High | High | interview Q2, Q3; PRD progress NFR; roadmap S-01; hot-spot dirs `src/components/cards` (7 commits/30d), `src/lib/services` (9 commits/30d) |
-| 3 | Generate reports success but the learner’s deck is empty after refresh | High | Medium | PRD FR-009; roadmap S-01 persistence; hot-spot dir `src/lib` (14 commits/30d) |
+| 1 | A signed-in learner sees another account’s cards (paste is request-scoped, not a stored row) | High | High | PRD guardrails + US-01 AC; roadmap S-01 isolation; hot-spot dirs `src/lib/services` (9 commits/30d), `src/pages/api` (6 commits/30d), `supabase/migrations` (RLS owner policies); inbox list is RLS-only; abuse: ownership |
+| 2 | Generate hangs, times out, or looks like an empty success after a Node-env pass | High | High | interview Q2, Q3; PRD progress NFR; roadmap S-01; hot-spot dirs `src/components/cards` (7 commits/30d), `src/lib/services` (9 commits/30d); HTTP Worker wall-clock hang is not a current duration-limit failure |
+| 3 | Generate reports HTTP 200 success but the learner’s deck is empty after refresh | High | Medium | PRD FR-009; roadmap S-01 persistence; hot-spot dir `src/lib` (14 commits/30d) is coarse — write + independent list is the surface |
 | 4 | A signed-in user can read or mutate another account’s card by id | High | Medium | PRD “never sees another account’s cards”; S-03/S-04 shipped on mutate/review; abuse: authorization |
 | 5 | An unauthenticated visitor persists a deck, or a session does not bind later cards to the registered account | High | Medium | PRD US-02, FR-001/010; roadmap S-02; hot-spot dir `src/pages/auth` (5 commits/30d) |
 | 6 | A review grade looks saved but the due queue does not change | Medium | Medium | PRD FR-008; roadmap S-04; hot-spot dir `src/lib/services` (9 commits/30d) |
@@ -54,9 +54,9 @@ Secret-in-client-bundle is High × Low (AGENTS.md server-only secrets). It is a 
 
 | Risk | What would prove protection | Must challenge | Context `/10x-research` must ground | Likely cheapest layer | Anti-pattern to avoid |
 |------|-----------------------------|----------------|--------------------------------------|-----------------------|-----------------------|
-| #1 | User A’s list/review/generate never includes User B’s cards or paste | “Logged in” equals “owns the row” | Identity, list vs write vs review entry, isolation mechanism | integration | Mock away the data store; assert an internal filter copy |
-| #2 | Slow or failed generate shows progress and a clean failure; does not freeze or claim cards were saved | Local Node success means Worker success | Runtime/timeout, progress contract, error translation; no live model in CI | integration (+ unit on the >2s progress rule) | Call the live model; e2e the whole generate happy path |
-| #3 | After a successful generate, a new fetch for that user returns the cards | HTTP 201 means the deck is populated | Write path, subsequent list, guest vs signed-in | integration | Happy-path insert only; oracle copied from the insert mapper |
+| #1 | User A’s list/review/generate never includes User B’s cards; generate cannot persist another account’s owner; paste is not stored | “Logged in” equals “owns the row” (inbox list has no app-level owner filter) | Identity, list vs write vs review entry, RLS vs extra owner predicate | integration | Mock away the data store; assert an internal filter copy |
+| #2 | In-flight generate shows progress (status + elapsed, not a 2s gate); timeout/5xx do not freeze or claim cards were saved; 200 + empty cards is not a clean failure | Vitest `node` success means workerd success (local `npm run dev` is already workerd) | Runtime/timeout, progress contract, error translation; no live model in CI | integration (+ unit on progress visibility while generating) | Call the live model; e2e the whole generate happy path; Workers harness first |
+| #3 | After a successful generate, a new list fetch for that user returns the cards (review queue is the wrong oracle) | HTTP 200 means the deck is populated | Write path, subsequent list, guest vs signed-in | integration | Happy-path insert only; oracle copied from the insert mapper |
 | #4 | Mutate/review of another user’s id is denied and writes nothing | Session + id in the URL is enough | id param, ownership vs RLS, error body (no leak) | integration | Own-card happy path only |
 | #5 | Guest generate/create is rejected; registered session is the owner of later cards | Seeing the dashboard means guests cannot write | Session, protected routes, generate/create APIs | integration | Full e2e signup when the API auth check is the signal |
 | #6 | A recorded grade changes what is due next; a failed write does not look graded | 200 on grade means the queue moved | Persist + due query; independent expected schedule | integration | Re-implement FSRS in the test as the oracle |
@@ -69,7 +69,7 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|------------|-----------------|---------------|------------|--------|---------------|
-| 1 | Critical-path coverage | Bootstrap Vitest and prove isolation plus generate failure/persist contracts | #1, #2, #3 | unit + integration | change opened | testing-critical-path-coverage |
+| 1 | Critical-path coverage | Bootstrap Vitest and prove isolation plus generate failure/persist contracts | #1, #2, #3 | unit + integration | researched | testing-critical-path-coverage |
 | 2 | Integration around hot-spots | Prove guest/bind, IDOR deny, and grade-queue persist | #4, #5, #6 | integration | not started | — |
 | 3 | Quality-gates wiring | Fail CI when the suite fails; cheap bundle/secret check | cross-cutting | gates | not started | — |
 
