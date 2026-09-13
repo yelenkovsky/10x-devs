@@ -271,20 +271,20 @@ No new migration. Hosted `flashcards` already has owner SELECT and `(user_id, cr
 
 #### Automated
 
-- [x] 1.1 Inbox `listFlashcards` orders `created_at` desc then `id` desc and still returns `Flashcard[]` with no cap
-- [x] 1.2 Browse helper filters status and `word_phrase` before applying the 1000 cap and returns `{ cards, capped }`
-- [x] 1.3 `src/types.ts` exports the browse result and status-filter types
-- [x] 1.4 `npx astro sync` succeeds
-- [x] 1.5 `npm run lint` succeeds
-- [x] 1.6 `npm run build` succeeds
+- [x] 1.1 Inbox `listFlashcards` orders `created_at` desc then `id` desc and still returns `Flashcard[]` with no cap — 7c6addc
+- [x] 1.2 Browse helper filters status and `word_phrase` before applying the 1000 cap and returns `{ cards, capped }` — 7c6addc
+- [x] 1.3 `src/types.ts` exports the browse result and status-filter types — 7c6addc
+- [x] 1.4 `npx astro sync` succeeds — 7c6addc
+- [x] 1.5 `npm run lint` succeeds — 7c6addc
+- [x] 1.6 `npm run build` succeeds — 7c6addc
 
 #### Manual
 
-- [x] 1.7 `/dashboard` still lists every owned status, newest first; same-timestamp twins stay in the same order across refresh
-- [x] 1.8 Browse helper with `status: "generated"` returns only generated rows for that user
-- [x] 1.9 Non-empty `q` matches `word_phrase` case-insensitively and does not match on definition/cloze alone
-- [x] 1.10 A 1001st matching row is omitted and `capped` is true; an exact 1000 matching rows leaves `capped` false
-- [x] 1.11 User B’s client never returns user A’s rows
+- [x] 1.7 `/dashboard` still lists every owned status, newest first; same-timestamp twins stay in the same order across refresh — 7c6addc
+- [x] 1.8 Browse helper with `status: "generated"` returns only generated rows for that user — 7c6addc
+- [x] 1.9 Non-empty `q` matches `word_phrase` case-insensitively and does not match on definition/cloze alone — 7c6addc
+- [x] 1.10 A 1001st matching row is omitted and `capped` is true; an exact 1000 matching rows leaves `capped` false — 7c6addc
+- [x] 1.11 User B’s client never returns user A’s rows — 7c6addc
 
 ### Phase 2: `/cards` catalog
 
