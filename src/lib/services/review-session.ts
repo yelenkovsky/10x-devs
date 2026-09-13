@@ -65,18 +65,26 @@ function notFound(): ReviewSessionError {
   return new ReviewSessionError("not_found", "Card not found.", 404);
 }
 
+async function emptySession(input: ReviewSessionInput): Promise<ReviewSessionPayload> {
+  const keptCount = await countKept(input);
+  return {
+    card: null,
+    remaining: 0,
+    emptyReason: keptCount === 0 ? "no_kept" : "none_due",
+  };
+}
+
 export async function getReviewSession(input: ReviewSessionInput): Promise<ReviewSessionPayload> {
   const remaining = await countDueQueue(input);
   if (remaining === 0) {
-    const keptCount = await countKept(input);
-    return {
-      card: null,
-      remaining: 0,
-      emptyReason: keptCount === 0 ? "no_kept" : "none_due",
-    };
+    return emptySession(input);
   }
 
   const row = await loadNextDueRow(input);
+  if (!row) {
+    return emptySession(input);
+  }
+
   return sessionFromRow(row, remaining, input.now);
 }
 
@@ -95,6 +103,8 @@ export async function gradeReview(input: GradeReviewInput): Promise<ReviewSessio
     .update(persist)
     .eq("id", input.cardId)
     .eq("user_id", input.userId)
+    .eq("status", "kept")
+    .or(`due.is.null,due.lte.${input.now.toISOString()}`)
     .select(REVIEW_LOAD_COLUMNS);
 
   if (error) {
@@ -136,7 +146,7 @@ async function countKept(input: ReviewSessionInput): Promise<number> {
   return count;
 }
 
-async function loadNextDueRow(input: ReviewSessionInput): Promise<ReviewRow> {
+async function loadNextDueRow(input: ReviewSessionInput): Promise<ReviewRow | null> {
   const { data, error } = await input.supabase
     .from("flashcards")
     .select(REVIEW_LOAD_COLUMNS)
@@ -150,6 +160,10 @@ async function loadNextDueRow(input: ReviewSessionInput): Promise<ReviewRow> {
 
   if (error) {
     throw unavailable();
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return null;
   }
 
   return parseReviewRow(data);

@@ -173,6 +173,8 @@ Queue filter (non-obvious vs the notes’ `due <= now` only):
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase. Phase blocks use plain bullets — the corresponding `- [ ]` checkboxes for these items live in the `## Progress` section at the bottom of the plan.
 
+2026-09-13: Phase 1 manuals 1.10–1.19 were waived so Phase 2 could start. Progress boxes stay unchecked until a human or `/10x-implement` records the actual checks.
+
 ---
 
 ## Phase 2: Review session UI
@@ -319,9 +321,9 @@ S-05 insert-as-kept can stay lazy: null FSRS until first grade. Do not invent a 
 
 #### Automated
 
-- [ ] 2.1 `src/pages/review.astro` exists and hydrates a `client:load` review island
-- [ ] 2.2 `PROTECTED_ROUTES` includes `/review`
-- [ ] 2.3 Dashboard header links to `/review`; review page links to `/dashboard`
+- [x] 2.1 `src/pages/review.astro` exists and hydrates a `client:load` review island
+- [x] 2.2 `PROTECTED_ROUTES` includes `/review`
+- [x] 2.3 Dashboard header links to `/review`; review page links to `/dashboard`
 - [ ] 2.4 `npx astro sync` succeeds
 - [ ] 2.5 `npm run lint` succeeds
 - [ ] 2.6 `npm run build` succeeds
