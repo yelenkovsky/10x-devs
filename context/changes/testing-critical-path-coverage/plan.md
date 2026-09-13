@@ -436,10 +436,10 @@ No schema migration. No product behavior change. Existing local DBs already have
 
 #### Automated
 
-- [x] 1.1 `vitest` is declared in `package.json` and `npm test` / `npm run test:watch` exist
-- [x] 1.2 `vitest.config.ts` uses `getViteConfig()` with default `environment: "node"`
-- [x] 1.3 `npm test` exits 0
-- [x] 1.4 `npm run lint` passes on the new files
+- [x] 1.1 `vitest` is declared in `package.json` and `npm test` / `npm run test:watch` exist — 5884bc4
+- [x] 1.2 `vitest.config.ts` uses `getViteConfig()` with default `environment: "node"` — 5884bc4
+- [x] 1.3 `npm test` exits 0 — 5884bc4
+- [x] 1.4 `npm run lint` passes on the new files — 5884bc4
 
 #### Manual
 
