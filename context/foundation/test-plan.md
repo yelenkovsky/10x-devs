@@ -69,7 +69,7 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|------------|-----------------|---------------|------------|--------|---------------|
-| 1 | Critical-path coverage | Bootstrap Vitest and prove isolation plus generate failure/persist contracts | #1, #2, #3 | unit + integration | researched | testing-critical-path-coverage |
+| 1 | Critical-path coverage | Bootstrap Vitest and prove isolation plus generate failure/persist contracts | #1, #2, #3 | unit + integration | planned | testing-critical-path-coverage |
 | 2 | Integration around hot-spots | Prove guest/bind, IDOR deny, and grade-queue persist | #4, #5, #6 | integration | not started | — |
 | 3 | Quality-gates wiring | Fail CI when the suite fails; cheap bundle/secret check | cross-cutting | gates | not started | — |
 
