@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CircleAlert, Sparkles } from "lucide-react";
 import { z } from "zod";
+import { FlashcardItem } from "@/components/cards/FlashcardItem";
 import { useElapsedSeconds } from "@/components/hooks/useElapsedSeconds";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -251,36 +252,19 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
         <ol className="space-y-4">
           {cards.map((card) => (
             <li key={card.id}>
-              <FlashcardItem card={card} />
+              <FlashcardItem
+                card={card}
+                onUpdated={(updated) => {
+                  setCards((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+                }}
+                onDeleted={(id) => {
+                  setCards((current) => current.filter((item) => item.id !== id));
+                }}
+              />
             </li>
           ))}
         </ol>
       ) : null}
-    </div>
-  );
-}
-
-function FlashcardItem({ card }: { card: Flashcard }) {
-  return (
-    <article className="rounded-2xl border border-white/10 bg-white/10 p-5 text-white backdrop-blur-xl">
-      <h3 className="text-lg font-semibold text-white">{card.wordPhrase}</h3>
-      <dl className="mt-4 space-y-3 text-sm">
-        <CardField label="Cloze" value={card.cloze} />
-        <CardField label="Word / phrase" value={card.wordPhrase} />
-        <CardField label="Full sentence" value={card.fullSentence} />
-        <CardField label="Definition" value={card.definition} />
-        <CardField label="Collocation / pattern" value={card.collocationPattern} />
-        <CardField label="Polish translation" value={card.translationPl} />
-      </dl>
-    </article>
-  );
-}
-
-function CardField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-xs tracking-wide text-blue-100/50 uppercase">{label}</dt>
-      <dd className="mt-0.5 text-blue-50">{value}</dd>
     </div>
   );
 }
