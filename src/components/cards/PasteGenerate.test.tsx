@@ -73,7 +73,7 @@ describe("PasteGenerate progress visibility", () => {
     const { promise, resolve } = Promise.withResolvers<Response>();
     stubGenerateFetch(() => promise);
 
-    render(<PasteGenerate initialCards={[INITIAL_CARD]} />);
+    render(<PasteGenerate initialCards={[INITIAL_CARD]} configured />);
     pasteAndSubmitGenerate();
 
     expect(screen.getByText("Generating typical-use cloze cards…")).toBeTruthy();
@@ -106,11 +106,35 @@ describe("PasteGenerate progress visibility", () => {
     stubGenerateFetch(() => Promise.resolve(new Response("not-json", { status: 503 })));
 
     const user = userEvent.setup();
-    render(<PasteGenerate initialCards={[INITIAL_CARD]} />);
+    render(<PasteGenerate initialCards={[INITIAL_CARD]} configured />);
     await user.type(screen.getByLabelText(/paste a word list or short text/i), "apple banana");
     await user.click(screen.getByRole("button", { name: /^generate$/i }));
 
     expect(screen.getByRole("alert").textContent).toContain(GENERIC_GENERATE_ERROR);
+    expect(screen.queryByText("Generating typical-use cloze cards…")).toBeNull();
+    assertInitialCardsUnchanged();
+  });
+
+  it("disables Generate and does not fetch when configured is false", () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    render(<PasteGenerate initialCards={[INITIAL_CARD]} configured={false} />);
+
+    const generate = screen.getByRole("button", { name: /^generate$/i });
+    expect(generate.hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("link", { name: /^settings$/i }).getAttribute("href")).toBe("/settings");
+
+    fireEvent.change(screen.getByLabelText(/paste a word list or short text/i), {
+      target: { value: "apple banana" },
+    });
+    const form = generate.closest("form");
+    if (!(form instanceof HTMLFormElement)) {
+      throw new Error("expected generate form");
+    }
+    fireEvent.submit(form);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
     expect(screen.queryByText("Generating typical-use cloze cards…")).toBeNull();
     assertInitialCardsUnchanged();
   });

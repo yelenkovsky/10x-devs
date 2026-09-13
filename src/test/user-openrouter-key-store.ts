@@ -7,12 +7,64 @@ export interface StoredOpenRouterKey {
   last4: string;
 }
 
+export interface StoredFlashcard {
+  id: string;
+  user_id: string;
+  generation_id: string;
+  status: "generated" | "kept";
+  cloze: string;
+  word_phrase: string;
+  full_sentence: string;
+  definition: string;
+  collocation_pattern: string;
+  translation_pl: string;
+  created_at: string;
+}
+
+interface FlashcardInsert {
+  user_id: string;
+  generation_id: string;
+  status: "generated" | "kept";
+  cloze: string;
+  word_phrase: string;
+  full_sentence: string;
+  definition: string;
+  collocation_pattern: string;
+  translation_pl: string;
+}
+
 export function createUserOpenRouterKeyStore() {
   const rows = new Map<string, StoredOpenRouterKey>();
+  const flashcards: StoredFlashcard[] = [];
 
   function clientFor(userId: string): SupabaseClient {
     return {
       from(table: string) {
+        if (table === "flashcards") {
+          return {
+            insert(newRows: FlashcardInsert[]) {
+              return {
+                select(_columns: string) {
+                  const inserted: StoredFlashcard[] = [];
+                  for (const row of newRows) {
+                    if (row.user_id !== userId) {
+                      return Promise.resolve({ data: null, error: { message: "row-level security" } });
+                    }
+                    const saved: StoredFlashcard = {
+                      ...row,
+                      id: crypto.randomUUID(),
+                      created_at: new Date().toISOString(),
+                    };
+                    flashcards.push(saved);
+                    inserted.push(saved);
+                  }
+                  return Promise.resolve({ data: inserted, error: null });
+                },
+              };
+            },
+          };
+        }
+
         if (table !== "user_openrouter_keys") {
           throw new Error(`unexpected table ${table}`);
         }
@@ -30,7 +82,7 @@ export function createUserOpenRouterKeyStore() {
               maybeSingle() {
                 const row = rows.get(userId);
                 return Promise.resolve({
-                  data: row ? { last4: row.last4 } : null,
+                  data: row ?? null,
                   error: null,
                 });
               },
@@ -51,5 +103,5 @@ export function createUserOpenRouterKeyStore() {
     } as unknown as SupabaseClient;
   }
 
-  return { rows, clientFor };
+  return { rows, flashcards, clientFor };
 }

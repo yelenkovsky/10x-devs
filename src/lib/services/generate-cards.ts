@@ -1,8 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { OPENROUTER_MODEL } from "astro:env/server";
+import { OPENROUTER_MODEL, USER_SECRETS_KEY } from "astro:env/server";
 import { z } from "zod";
 import { flashcardFieldsSchema, type FlashcardFields } from "@/lib/services/flashcard-fields";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
+import { loadDecryptedOpenRouterApiKey } from "@/lib/services/openrouter-key";
 import type { Flashcard, GenerateCardsResponse } from "@/types";
 
 export const CARD_CAP = 15;
@@ -105,15 +106,22 @@ export interface GenerateCardsInput {
   supabase: SupabaseClient;
 }
 
-function resolveGenerateApiKey(): string | undefined {
-  // Operator OPENROUTER_API_KEY was removed in Phase 1. User-key decrypt lands in Phase 3.
-  return undefined;
-}
+const GENERATION_NOT_CONFIGURED_MESSAGE = "Add your OpenRouter API key in Settings to generate cards.";
+const GENERATION_INVALID_KEY_MESSAGE = "This OpenRouter key was rejected. Replace it in Settings.";
 
 export async function generateCards(input: GenerateCardsInput): Promise<GenerateCardsResponse> {
-  const apiKey = resolveGenerateApiKey();
-  if (!apiKey) {
-    throw new GenerateCardsError("generation_not_configured", "Generation is not configured.");
+  let apiKey: string;
+  try {
+    const decrypted = await loadDecryptedOpenRouterApiKey(input.supabase, USER_SECRETS_KEY);
+    if (!decrypted) {
+      throw new GenerateCardsError("generation_not_configured", GENERATION_NOT_CONFIGURED_MESSAGE);
+    }
+    apiKey = decrypted;
+  } catch (error) {
+    if (error instanceof GenerateCardsError) {
+      throw error;
+    }
+    throw unavailable();
   }
 
   const content = await requestOpenRouterCards(input.paste, input.origin, apiKey);
@@ -179,6 +187,10 @@ async function requestOpenRouterCards(paste: string, origin: string, apiKey: str
       throw new GenerateCardsError("generation_timeout", "Generation timed out. Try again.");
     }
     throw unavailable();
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new GenerateCardsError("generation_invalid_key", GENERATION_INVALID_KEY_MESSAGE);
   }
 
   if (!response.ok) {

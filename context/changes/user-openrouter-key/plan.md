@@ -335,14 +335,14 @@ New table; no backfill. Existing accounts have no key and cannot generate until 
 
 #### Automated
 
-- [ ] 3.1 `generate-cards.ts` does not import or read `OPENROUTER_API_KEY`
-- [ ] 3.2 `config-status.ts` has no OpenRouter row
-- [ ] 3.3 Tests: no user key → `generation_not_configured` and OpenRouter `fetch` is not called; OpenRouter `401` → `generation_invalid_key` and no insert; user A’s key is not used when generating as user B
-- [ ] 3.4 `PasteGenerate` test: `configured={false}` disables Generate and does not `fetch`
-- [ ] 3.5 `npm test` succeeds
-- [ ] 3.6 `npx astro sync` succeeds
-- [ ] 3.7 `npm run lint` succeeds
-- [ ] 3.8 `npm run build` succeeds
+- [x] 3.1 `generate-cards.ts` does not import or read `OPENROUTER_API_KEY`
+- [x] 3.2 `config-status.ts` has no OpenRouter row
+- [x] 3.3 Tests: no user key → `generation_not_configured` and OpenRouter `fetch` is not called; OpenRouter `401` → `generation_invalid_key` and no insert; user A’s key is not used when generating as user B
+- [x] 3.4 `PasteGenerate` test: `configured={false}` disables Generate and does not `fetch`
+- [x] 3.5 `npm test` succeeds
+- [x] 3.6 `npx astro sync` succeeds
+- [x] 3.7 `npm run lint` succeeds
+- [x] 3.8 `npm run build` succeeds
 
 #### Manual
 

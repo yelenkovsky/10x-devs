@@ -3,17 +3,25 @@ import PasteGenerate from "@/components/cards/PasteGenerate";
 import Topbar from "@/components/Topbar.astro";
 import Layout from "@/layouts/Layout.astro";
 import { listFlashcards } from "@/lib/services/list-flashcards";
+import { loadOpenRouterKeyHint } from "@/lib/services/openrouter-key";
 import { createClient } from "@/lib/supabase";
 import type { Flashcard } from "@/types";
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 let cards: Flashcard[] = [];
+let configured = false;
 let loadError = !supabase;
 if (supabase) {
   try {
     cards = await listFlashcards(supabase);
   } catch {
     loadError = true;
+  }
+  try {
+    const keyStatus = await loadOpenRouterKeyHint(supabase);
+    configured = keyStatus.configured;
+  } catch {
+    configured = false;
   }
 }
 ---
@@ -27,7 +35,7 @@ if (supabase) {
           Dashboard
         </h1>
       </header>
-      <PasteGenerate initialCards={cards} loadError={loadError} client:load />
+      <PasteGenerate initialCards={cards} loadError={loadError} configured={configured} client:load />
     </div>
   </div>
 </Layout>
