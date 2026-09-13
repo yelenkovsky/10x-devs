@@ -42,3 +42,36 @@ export interface MutateFlashcardCardResponse {
 export interface MutateFlashcardDeleteResponse {
   id: string;
 }
+
+export type ReviewGrade = 1 | 2 | 3 | 4;
+
+export type ReviewEmptyReason = "no_kept" | "none_due";
+
+export interface ReviewCard {
+  id: string;
+  cloze: string;
+  wordPhrase: string;
+  fullSentence: string;
+  definition: string;
+  collocationPattern: string;
+  translationPl: string;
+}
+
+export interface GradeReviewRequest {
+  cardId: string;
+  grade: ReviewGrade;
+}
+
+export interface ReviewGradeLabels {
+  1: string;
+  2: string;
+  3: string;
+  4: string;
+}
+
+export interface ReviewSessionPayload {
+  card: ReviewCard | null;
+  remaining: number;
+  emptyReason?: ReviewEmptyReason;
+  grades?: ReviewGradeLabels;
+}

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import { FSRS_NULL_PATCH } from "@/lib/services/flashcard-fsrs";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
 import type {
   Flashcard,
@@ -56,7 +57,7 @@ export async function mutateFlashcard(
     case "keep":
       return { card: await updateOwnedCard(input, { status: "kept" }) };
     case "unkeep":
-      return { card: await updateOwnedCard(input, { status: "generated" }) };
+      return { card: await updateOwnedCard(input, { status: "generated", ...FSRS_NULL_PATCH }) };
     case "delete":
       return { id: await deleteOwnedCard(input) };
     case "edit": {
@@ -80,7 +81,7 @@ export async function mutateFlashcard(
   }
 }
 
-interface FlashcardUpdate {
+type FlashcardUpdate = {
   status: FlashcardStatus;
   cloze?: string;
   word_phrase?: string;
@@ -88,7 +89,7 @@ interface FlashcardUpdate {
   definition?: string;
   collocation_pattern?: string;
   translation_pl?: string;
-}
+} & Partial<typeof FSRS_NULL_PATCH>;
 
 async function updateOwnedCard(input: MutateFlashcardInput, patch: FlashcardUpdate): Promise<Flashcard> {
   const { data, error } = await input.supabase
