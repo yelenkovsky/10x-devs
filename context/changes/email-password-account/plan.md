@@ -280,17 +280,17 @@ No database migrations. Hosted Auth stays confirmation-on as in `context/deploym
 
 #### Automated
 
-- [x] 2.1 `src/pages/api/auth/signin.ts`, `signup.ts`, and `signout.ts` each export `const prerender = false`
-- [x] 2.2 `npx astro sync` succeeds
-- [x] 2.3 `npm run lint` succeeds
-- [x] 2.4 `npm run build` succeeds
+- [x] 2.1 `src/pages/api/auth/signin.ts`, `signup.ts`, and `signout.ts` each export `const prerender = false` — 191360c
+- [x] 2.2 `npx astro sync` succeeds — 191360c
+- [x] 2.3 `npm run lint` succeeds — 191360c
+- [x] 2.4 `npm run build` succeeds — 191360c
 
 #### Manual
 
-- [x] 2.5 With local confirmations off, a new sign-up issues a session and the browser lands on `/dashboard` (or the supplied safe `next`)
-- [x] 2.6 Signing up again with that same email does not show a “account created / check email” success page; it shows the generic notice on sign-in
-- [x] 2.7 Wrong password shows mapped copy; the URL does not contain a raw Supabase `error.message`
-- [x] 2.8 A safe hidden/query `next` is honored; `next=https://example.com`, `next=//evil`, and `next=/%09//evil.com` all land on `/dashboard`
+- [x] 2.5 With local confirmations off, a new sign-up issues a session and the browser lands on `/dashboard` (or the supplied safe `next`) — 191360c
+- [x] 2.6 Signing up again with that same email does not show a “account created / check email” success page; it shows the generic notice on sign-in — 191360c
+- [x] 2.7 Wrong password shows mapped copy; the URL does not contain a raw Supabase `error.message` — 191360c
+- [x] 2.8 A safe hidden/query `next` is honored; `next=https://example.com`, `next=//evil`, and `next=/%09//evil.com` all land on `/dashboard` — 191360c
 
 ### Phase 3: Middleware, guest contract, and signed-in chrome
 
