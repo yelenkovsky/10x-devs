@@ -2,17 +2,19 @@
 # Implementation Review: Review kept cards with a ready-made SRS
 
 - **Plan**: context/changes/srs-review-session/plan.md
-- **Scope**: Phases 1–2 of 2 (Phase 1 automated complete; Phase 2 in progress)
+- **Scope**: Phases 1–2 of 2 (automated complete; manuals pending)
 - **Date**: 2026-09-13
-- **Verdict**: NEEDS ATTENTION
-- **Findings**: 0 critical 1 warning 3 observations
+- **Verdict**: APPROVED
+- **Findings**: 0 critical 2 warnings 3 observations
+
+Combined from the mid-slice review (Phase 1 + Phase 2 in progress) and the full-plan review after Phase 2 landed. Earlier finding IDs are unchanged; the full-plan extra is **F5**.
 
 ## Verdicts
 
 | Dimension | Verdict |
 |-----------|---------|
 | Plan Adherence | PASS |
-| Scope Discipline | PASS |
+| Scope Discipline | WARNING |
 | Safety & Quality | WARNING |
 | Architecture | PASS |
 | Pattern Consistency | PASS |
@@ -69,12 +71,22 @@
 - **Fix**: Run the Phase 1 manual checklist (or record that it was waived) before treating the slice as done.
 - **Decision**: FIXED (waived in plan.md Implementation Note; Progress 1.10–1.19 left unchecked)
 
+### F5 — Unplanned workerd React/ts-fsrs prebundle
+
+- **Severity**: ⚠️ WARNING
+- **Impact**: 🏃 LOW — quick decision; fix is obvious and narrowly scoped
+- **Dimension**: Scope Discipline
+- **Location**: astro.config.mjs:9-36
+- **Detail**: Phase 2 commit `fe5ae2b` added `prebundleReactForWorkerd()` plus Vite `dedupe` / `optimizeDeps` that include `ts-fsrs` (and `lucide-react`, `zod`, `@radix-ui/react-slot`). Not in Changes Required. It is infra so workerd SSR does not remount React when the new scheduler import is optimized — not a product-scope violation of the Non-Goals.
+- **Fix**: Document the workerd prebundle in the plan as an addendum.
+- **Decision**: FIXED — documented in plan.md Phase 2 addendum
+
 ## Automated verification (re-run 2026-09-13)
 
 | Check | Result |
 |-------|--------|
 | Migration `20260913182131_add_flashcard_fsrs.sql` exists (nullable FSRS columns + `flashcards_state_check` + `flashcards_user_id_due_kept_idx`) | PASS |
-| Migration applies locally | NOT RE-VERIFIED — Docker daemon was not running |
+| Migration applies locally | PASS — local and remote both list `20260913182131` (first review: NOT RE-VERIFIED — Docker was down) |
 | `ts-fsrs` is a runtime dependency (`^5.4.2`); no optimizer / NAPI / WASM siblings | PASS |
 | `src/pages/api/review.ts` exports `prerender = false`, `GET`, `POST` | PASS |
 | `src/types.ts` exports review session request/response types; `Flashcard` stays content-only | PASS |
@@ -89,7 +101,7 @@
 
 ## Manual progress
 
-Phase 1 manuals 1.10–1.19 and Phase 2 manuals 2.7–2.12 are all `[ ]`. None are marked complete without evidence. Phase 2 automated 2.4–2.6 are still `[ ]` in Progress even though this review re-ran them successfully (impl-review does not write Progress).
+Phase 1 manuals 1.10–1.19 are `[ ]` (waived in the Phase 1 Implementation Note so Phase 2 could start). Phase 2 manuals 2.7–2.12 are `[ ]`. None are marked complete without evidence.
 
 ## Triage
 
@@ -97,3 +109,4 @@ Phase 1 manuals 1.10–1.19 and Phase 2 manuals 2.7–2.12 are all `[ ]`. None a
 - **F2**: FIXED
 - **F3**: FIXED (added `supabase/snippets/` to `supabase/.gitignore`)
 - **F4**: FIXED (waived in `plan.md`; Progress left unchecked)
+- **F5**: FIXED (documented in `plan.md` Phase 2 addendum)

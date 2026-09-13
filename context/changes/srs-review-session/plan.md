@@ -238,6 +238,10 @@ Add the protected `/review` surface: cloze → reveal → grade with interval la
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful.
 
+### Addendum (2026-09-13): workerd prebundle
+
+Workerd SSR lazy-optimizes new bare imports (including `ts-fsrs`) and remounts React. `astro.config.mjs` adds `prebundleReactForWorkerd()` plus Vite `dedupe` / `optimizeDeps` so the review island stays on one React copy. Not a product feature.
+
 ---
 
 ## Testing Strategy
