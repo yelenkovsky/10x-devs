@@ -313,12 +313,12 @@ No new migration. Hosted `flashcards` already has owner SELECT and `(user_id, cr
 
 #### Automated
 
-- [x] 3.1 Signed-in `Topbar` links to `/dashboard`, `/cards`, and `/review`
-- [x] 3.2 `/dashboard`, `/review`, and `/cards` mount `Topbar`; auth pages do not
-- [x] 3.3 Product page headers no longer duplicate those nav links or Sign out
-- [x] 3.4 `npx astro sync` succeeds
-- [x] 3.5 `npm run lint` succeeds
-- [x] 3.6 `npm run build` succeeds
+- [x] 3.1 Signed-in `Topbar` links to `/dashboard`, `/cards`, and `/review` — 60015c0
+- [x] 3.2 `/dashboard`, `/review`, and `/cards` mount `Topbar`; auth pages do not — 60015c0
+- [x] 3.3 Product page headers no longer duplicate those nav links or Sign out — 60015c0
+- [x] 3.4 `npx astro sync` succeeds — 60015c0
+- [x] 3.5 `npm run lint` succeeds — 60015c0
+- [x] 3.6 `npm run build` succeeds — 60015c0
 
 #### Manual
 
