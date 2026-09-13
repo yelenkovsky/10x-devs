@@ -52,13 +52,13 @@ A generate-from-paste flow usually binds **output count (and targets) to the pas
 
 > **The actual problem to plan around is**: A successful generate can persist a 15-card model batch that is not grounded in the pasted targets, and the UI reports that as “Using the first 15 items from this paste.”
 
-The initial framing was wrong: there is no second path that builds cards from the first 15 paste items. The banner is the intended cap note on the only generate path. Leftover dashboard cards are not what filled the list (empty deck). What remains is the generate contract on production: unconstrained schema + `truncated` from returned count + persist-all-valid, so an ungrounded 15-card OpenRouter envelope is saved and labeled as a truncated paste.
+The initial framing was wrong: there is no second path that builds cards from the first 15 paste items. The banner is the intended cap note on the only generate path. Leftover dashboard cards are not what filled the list (empty deck). What remains is the generate contract: unconstrained schema + `truncated` from returned count + persist-all-valid, so an ungrounded 15-card OpenRouter envelope is saved and labeled as a truncated paste. That is in `generateCards` and `PasteGenerate`; it does not depend on a captured production payload.
 
 ## Confidence
 
-- **MEDIUM** — evidence points one way but convention or signal weaker
+- **HIGH** — strong evidence + matches convention + decisive narrowing signal
 
-Mechanism for banner + 15-card persist is strong, and a second independent pass landed on the same contract (not a fallback, not leftovers, not a Worker that strips paste). What is still not captured is a production OpenRouter payload: user `content` vs returned `wordPhrase`s for a known short paste. One hosted generate with a 1–3 word paste would close that.
+The contract is readable in-repo (`truncated = envelope.data.cards.length >= CARD_CAP`; no paste-item count; no `wordPhrase`-in-paste check). Alternatives (fallback builder, leftover inbox, hosted paste drop) were absent. The production-only report is where the live model was called, not a second unknown cause.
 
 ## What Changes for /10x-plan
 
