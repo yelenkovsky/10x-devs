@@ -1,24 +1,29 @@
 ---
-import PasteGenerate from "@/components/cards/PasteGenerate";
+import ReviewSession from "@/components/cards/ReviewSession";
 import Layout from "@/layouts/Layout.astro";
-import { listFlashcards } from "@/lib/services/list-flashcards";
+import { getReviewSession } from "@/lib/services/review-session";
 import { createClient } from "@/lib/supabase";
-import type { Flashcard } from "@/types";
+import type { ReviewSessionPayload } from "@/types";
 
 const { user } = Astro.locals;
 const supabase = createClient(Astro.request.headers, Astro.cookies);
-let cards: Flashcard[] = [];
-let loadError = !supabase;
-if (supabase) {
+const emptySession: ReviewSessionPayload = { card: null, remaining: 0, emptyReason: "no_kept" };
+let initialSession = emptySession;
+let loadError = !supabase || !user;
+if (supabase && user) {
   try {
-    cards = await listFlashcards(supabase);
+    initialSession = await getReviewSession({
+      userId: user.id,
+      supabase,
+      now: new Date(),
+    });
   } catch {
     loadError = true;
   }
 }
 ---
 
-<Layout title="Dashboard">
+<Layout title="Review">
   <div class="bg-cosmic min-h-screen p-4 sm:p-8">
     <div class="mx-auto flex max-w-3xl flex-col gap-6">
       <header
@@ -26,7 +31,7 @@ if (supabase) {
       >
         <div>
           <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-            Dashboard
+            Review
           </h1>
           <p class="mt-2 text-blue-100/80">
             Welcome, <span class="font-semibold text-white">{user?.email}</span>
@@ -34,10 +39,10 @@ if (supabase) {
         </div>
         <div class="flex flex-wrap items-center gap-3">
           <a
-            href="/review"
+            href="/dashboard"
             class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
           >
-            Review
+            Dashboard
           </a>
           <form method="POST" action="/api/auth/signout">
             <button
@@ -49,7 +54,7 @@ if (supabase) {
           </form>
         </div>
       </header>
-      <PasteGenerate initialCards={cards} loadError={loadError} client:load />
+      <ReviewSession initialSession={initialSession} loadError={loadError} client:load />
     </div>
   </div>
 </Layout>
