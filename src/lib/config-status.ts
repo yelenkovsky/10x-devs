@@ -1,4 +1,4 @@
-import { OPENROUTER_API_KEY, SUPABASE_URL, SUPABASE_KEY } from "astro:env/server";
+import { SUPABASE_URL, SUPABASE_KEY, USER_SECRETS_KEY } from "astro:env/server";
 
 export interface ConfigStatus {
   name: string;
@@ -17,11 +17,9 @@ export const configStatuses: ConfigStatus[] = [
     docsLabel: "Zobacz instrukcję konfiguracji",
   },
   {
-    name: "OpenRouter",
-    configured: Boolean(OPENROUTER_API_KEY),
-    message: "OpenRouter nie jest skonfigurowany — generowanie fiszek jest wyłączone.",
-    docsUrl: "https://openrouter.ai/docs/quickstart",
-    docsLabel: "Zobacz instrukcję konfiguracji",
+    name: "User secrets key",
+    configured: Boolean(USER_SECRETS_KEY),
+    message: "User secrets key is not configured — saving API keys is disabled.",
   },
 ];
 
