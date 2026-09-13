@@ -54,10 +54,11 @@ export function authPageQuery(input: { error?: string | null; notice?: string | 
  * auth pathname. Return the re-serialized string, never the raw input.
  *
  * The post-parse `//` check is load-bearing for raw `//host` values.
- * Node's URL parser does not strip percent-encoded C0 controls from the
- * pathname (`/%09//evil.com` stays encoded, same origin), so we also
- * decode and reject tab/newline/CR smuggling that a Location header would
- * turn into a protocol-relative redirect.
+ * Node's URL parser does not strip percent-encoded C0 controls or
+ * backslashes from the pathname (`/%09//evil.com` and `/%5C%5Cevil.com`
+ * stay encoded, same origin), so we also decode and reject tab/newline/CR
+ * and `\` smuggling that a Location header would turn into a
+ * protocol-relative redirect.
  */
 export function safeReturnPath(raw: unknown, base: string | URL): string {
   if (typeof raw !== "string" || raw === "") {
@@ -83,6 +84,10 @@ export function safeReturnPath(raw: unknown, base: string | URL): string {
       if (code <= 31 || code === 127) {
         return DEFAULT_RETURN_PATH;
       }
+    }
+
+    if (decoded.includes("\\")) {
+      return DEFAULT_RETURN_PATH;
     }
 
     return serialized;
@@ -114,7 +119,7 @@ export function mapAuthError(error: { code?: string | null }, flow: AuthFormPage
 }
 
 export function requireUser(locals: App.Locals): Response | null {
-  if (locals.user !== null) {
+  if (locals.user) {
     return null;
   }
 

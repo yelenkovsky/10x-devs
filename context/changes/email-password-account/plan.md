@@ -223,6 +223,10 @@ Enforce the session on protected HTML, send signed-in visitors away from auth fo
 
 **Implementation Note**: After completing this phase and all automated verification passes, pause here for manual confirmation from the human that the manual testing was successful before proceeding to the next phase.
 
+## Addendum (impl review 2026-09-13)
+
+`eslint.config.js` turns `@typescript-eslint/no-misused-promises` off for `**/*.astro`. `astro-eslint-parser` crashes on `return Astro.redirect(...)` in frontmatter (Phase 3 signed-in redirects). Keep the override repo-wide for that construct; do not treat it as a product-scope change.
+
 ---
 
 ## Testing Strategy
