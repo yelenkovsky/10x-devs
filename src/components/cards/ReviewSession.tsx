@@ -8,7 +8,7 @@ import type { ReviewGrade, ReviewSessionPayload } from "@/types";
 const GENERIC_GRADE_ERROR = "Could not save the grade. Try again.";
 const NOT_FOUND_ERROR = "Card not found.";
 const LOAD_ERROR_MESSAGE = "Review session could not be loaded. Refresh to try again.";
-const NO_KEPT_MESSAGE = "No kept cards to review. Accept cards on the dashboard first.";
+const NO_KEPT_MESSAGE = "No kept cards to review. Accept cards on the dashboard or create a card by hand.";
 const NONE_DUE_MESSAGE = "You're caught up — no kept cards are due right now.";
 
 const reviewCardSchema = z.object({

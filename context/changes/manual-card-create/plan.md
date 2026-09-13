@@ -266,31 +266,31 @@ No new migration. `generation_id` stays `NOT NULL`; the service supplies a UUID.
 
 #### Manual
 
-- [ ] 1.7 Unauthenticated POST → 401; no row inserted
-- [ ] 1.8 Signed-in POST of six non-empty fields → 200, `status: "kept"`, six fields present, `generationId` is a UUID, all FSRS columns null
-- [ ] 1.9 Signed-in POST with a blank or whitespace-only field → 400; no row
-- [ ] 1.10 Signed-in second POST with the same word/phrase → 200; both rows exist
-- [ ] 1.11 Signed-in as user B, none of user A’s new card appears in B’s list
+- [x] 1.7 Unauthenticated POST → 401; no row inserted
+- [x] 1.8 Signed-in POST of six non-empty fields → 200, `status: "kept"`, six fields present, `generationId` is a UUID, all FSRS columns null
+- [x] 1.9 Signed-in POST with a blank or whitespace-only field → 400; no row
+- [x] 1.10 Signed-in second POST with the same word/phrase → 200; both rows exist
+- [x] 1.11 Signed-in as user B, none of user A’s new card appears in B’s list
 
 ### Phase 2: Dashboard create UI and empty copy
 
 #### Automated
 
-- [ ] 2.1 Create form lives on `/dashboard` (no new HTML route; `PROTECTED_ROUTES` unchanged)
-- [ ] 2.2 Review `no_kept` copy mentions creating a card by hand (not only Accept)
-- [ ] 2.3 `npx astro sync` succeeds
-- [ ] 2.4 `npm run lint` succeeds
-- [ ] 2.5 `npm run build` succeeds
+- [x] 2.1 Create form lives on `/dashboard` (no new HTML route; `PROTECTED_ROUTES` unchanged)
+- [x] 2.2 Review `no_kept` copy mentions creating a card by hand (not only Accept)
+- [x] 2.3 `npx astro sync` succeeds
+- [x] 2.4 `npm run lint` succeeds
+- [x] 2.5 `npm run build` succeeds
 
 #### Manual
 
-- [ ] 2.6 Empty dashboard mentions generate and create by hand
-- [ ] 2.7 Toggle opens the form; Cancel hides it without writing
-- [ ] 2.8 Empty / whitespace field shows “This field is required.” and does not `fetch`
-- [ ] 2.9 Save prepends a `kept` card, clears and collapses the form, stays on `/dashboard`
-- [ ] 2.10 Typical-use hints are visible on the open form
-- [ ] 2.11 Refresh still shows the card as `kept`
-- [ ] 2.12 `/review` with only this new kept card (null FSRS) shows it; `no_kept` copy mentions create by hand when there are no kept cards
-- [ ] 2.13 Short action does not freeze the page; a failed create shows an error on the form
-- [ ] 2.14 Signed in as user B, none of user A’s cards appear
-- [ ] 2.15 Typical-use spot-check: one or two hand-made cards teach context, collocation, and grammar pattern — not C1/C2 showpieces
+- [x] 2.6 Empty dashboard mentions generate and create by hand
+- [x] 2.7 Toggle opens the form; Cancel hides it without writing
+- [x] 2.8 Empty / whitespace field shows “This field is required.” and does not `fetch`
+- [x] 2.9 Save prepends a `kept` card, clears and collapses the form, stays on `/dashboard`
+- [x] 2.10 Typical-use hints are visible on the open form
+- [x] 2.11 Refresh still shows the card as `kept`
+- [x] 2.12 `/review` with only this new kept card (null FSRS) shows it; `no_kept` copy mentions create by hand when there are no kept cards
+- [x] 2.13 Short action does not freeze the page; a failed create shows an error on the form
+- [x] 2.14 Signed in as user B, none of user A’s cards appear
+- [x] 2.15 Typical-use spot-check: one or two hand-made cards teach context, collocation, and grammar pattern — not C1/C2 showpieces

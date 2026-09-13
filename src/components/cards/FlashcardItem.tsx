@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CircleAlert } from "lucide-react";
 import { z } from "zod";
+import { FLASHCARD_FIELDS, type FlashcardFieldKey } from "@/components/cards/card-fields";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Flashcard, MutateFlashcardRequest } from "@/types";
@@ -36,18 +37,8 @@ const mutateErrorSchema = z.object({
   code: z.string().optional(),
 });
 
-const EDIT_FIELDS = [
-  { key: "cloze", label: "Cloze", multiline: true },
-  { key: "wordPhrase", label: "Word / phrase", multiline: false },
-  { key: "fullSentence", label: "Full sentence", multiline: true },
-  { key: "definition", label: "Definition", multiline: true },
-  { key: "collocationPattern", label: "Collocation / pattern", multiline: false },
-  { key: "translationPl", label: "Polish translation", multiline: false },
-] as const;
-
-type EditFieldKey = (typeof EDIT_FIELDS)[number]["key"];
-type EditDraft = Record<EditFieldKey, string>;
-type FieldErrors = Partial<Record<EditFieldKey, string>>;
+type EditDraft = Record<FlashcardFieldKey, string>;
+type FieldErrors = Partial<Record<FlashcardFieldKey, string>>;
 
 const fieldInputClass =
   "w-full rounded-lg border bg-white/10 px-3 py-2 text-white placeholder-white/40 transition-colors focus:ring-2 focus:outline-none";
@@ -80,7 +71,7 @@ export function FlashcardItem({ card, onUpdated, onDeleted }: FlashcardItemProps
     setDraft(draftFromCard(card));
   }
 
-  function updateDraft(key: EditFieldKey, value: string) {
+  function updateDraft(key: FlashcardFieldKey, value: string) {
     setDraft((current) => ({ ...current, [key]: value }));
     if (fieldErrors[key]) {
       setFieldErrors((current) => ({ ...current, [key]: undefined }));
@@ -142,7 +133,7 @@ export function FlashcardItem({ card, onUpdated, onDeleted }: FlashcardItemProps
     const nextErrors: FieldErrors = {};
     const trimmed = {} as EditDraft;
 
-    for (const field of EDIT_FIELDS) {
+    for (const field of FLASHCARD_FIELDS) {
       const value = draft[field.key].trim();
       trimmed[field.key] = value;
       if (value === "") {
@@ -177,7 +168,7 @@ export function FlashcardItem({ card, onUpdated, onDeleted }: FlashcardItemProps
           }}
           noValidate
         >
-          {EDIT_FIELDS.map((field) => (
+          {FLASHCARD_FIELDS.map((field) => (
             <EditField
               key={field.key}
               id={`${card.id}-${field.key}`}
@@ -202,12 +193,9 @@ export function FlashcardItem({ card, onUpdated, onDeleted }: FlashcardItemProps
         </form>
       ) : (
         <dl className="mt-4 space-y-3 text-sm">
-          <CardField label="Cloze" value={card.cloze} />
-          <CardField label="Word / phrase" value={card.wordPhrase} />
-          <CardField label="Full sentence" value={card.fullSentence} />
-          <CardField label="Definition" value={card.definition} />
-          <CardField label="Collocation / pattern" value={card.collocationPattern} />
-          <CardField label="Polish translation" value={card.translationPl} />
+          {FLASHCARD_FIELDS.map((field) => (
+            <CardField key={field.key} label={field.label} value={card[field.key]} />
+          ))}
         </dl>
       )}
 

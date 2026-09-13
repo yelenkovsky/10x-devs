@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CircleAlert, Sparkles } from "lucide-react";
 import { z } from "zod";
+import { CreateFlashcard } from "@/components/cards/CreateFlashcard";
 import { FlashcardItem } from "@/components/cards/FlashcardItem";
 import { useElapsedSeconds } from "@/components/hooks/useElapsedSeconds";
 import { Button } from "@/components/ui/button";
@@ -217,6 +218,12 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
         </Button>
       </form>
 
+      <CreateFlashcard
+        onCreated={(card) => {
+          setCards((current) => [card, ...current]);
+        }}
+      />
+
       {batchNotes?.failedCount ? (
         <p className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80" role="status">
           {batchNotes.failedCount} {batchNotes.failedCount === 1 ? "card" : "cards"} from this batch could not be saved.
@@ -244,7 +251,7 @@ export default function PasteGenerate({ initialCards, loadError = false }: Paste
           className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-blue-100/60"
           role="status"
         >
-          No cards yet. Generate from a paste above. They stay on this account after refresh.
+          No cards yet. Generate from a paste above or create a card by hand. They stay on this account after refresh.
         </p>
       ) : null}
 
