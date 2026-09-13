@@ -14,6 +14,13 @@ export interface Flashcard {
   createdAt: string;
 }
 
+export type BrowseFlashcardStatus = "all" | FlashcardStatus;
+
+export interface BrowseFlashcardsResult {
+  cards: Flashcard[];
+  capped: boolean;
+}
+
 export interface GenerateCardsResponse {
   cards: Flashcard[];
   failedCount: number;

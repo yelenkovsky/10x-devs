@@ -47,7 +47,7 @@ The north star — the smallest end-to-end slice whose successful delivery would
 | S-03 | gate-generated-cards       | accept, edit, or delete a generated flashcard                                    | S-01          | US-01, FR-005                         | in-progress |
 | S-04 | srs-review-session         | review their flashcards with a ready-made spaced-repetition algorithm            | S-03          | US-01, FR-008                         | in-progress |
 | S-05 | manual-card-create         | create a flashcard by hand with the same fields as generated cards               | S-01          | US-01, FR-006                         | in-progress |
-| S-06 | browse-flashcards          | browse their flashcards                                                          | S-01          | FR-007                                | planning |
+| S-06 | browse-flashcards          | browse their flashcards                                                          | S-01          | FR-007                                | in-progress |
 
 
 
@@ -169,7 +169,7 @@ None. Frontend, auth, and deploy are present in the baseline and are not re-scaf
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Required, but the first session is a review queue, not a card catalog. Sequenced last so speed does not spend the first proving story on a browse-all surface.
-- **Status:** planning
+- **Status:** in-progress
 
 
 
