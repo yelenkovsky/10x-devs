@@ -1,6 +1,7 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import PasswordVisibilityScript from "@/components/auth/PasswordVisibilityScript.astro";
 import SignUpForm from "@/components/auth/SignUpForm";
+import Layout from "@/layouts/Layout.astro";
 import { DEFAULT_RETURN_PATH, authPageQuery, safeReturnPath } from "@/lib/auth";
 
 if (Astro.locals.user) {
@@ -39,4 +40,5 @@ const signinHref = `/auth/signin${authPageQuery({ next })}`;
       </p>
     </div>
   </div>
+  <PasswordVisibilityScript />
 </Layout>
