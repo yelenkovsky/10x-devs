@@ -221,16 +221,16 @@ No schema change. No paste backfill. Existing `generated` rows that were ungroun
 
 #### Automated
 
-- [x] 1.1 `src/lib/services/paste-targets.test.ts` covers list vs prose, cap, truncated, and grounding cases above
-- [x] 1.2 `generate-cards` tests persist only grounded cards and set `truncated` from input cut, including the 3-item + 15-envelope case
-- [x] 1.3 `npm test` exits 0
-- [x] 1.4 `npm run lint` succeeds
-- [x] 1.5 `npx astro sync` succeeds
-- [x] 1.6 `npm run build` succeeds
+- [x] 1.1 `src/lib/services/paste-targets.test.ts` covers list vs prose, cap, truncated, and grounding cases above — 231d89e
+- [x] 1.2 `generate-cards` tests persist only grounded cards and set `truncated` from input cut, including the 3-item + 15-envelope case — 231d89e
+- [x] 1.3 `npm test` exits 0 — 231d89e
+- [x] 1.4 `npm run lint` succeeds — 231d89e
+- [x] 1.5 `npx astro sync` succeeds — 231d89e
+- [x] 1.6 `npm run build` succeeds — 231d89e
 
 #### Manual
 
-- [x] 1.7 Local signed-in generate of a 3-word slash list (live key) yields cards whose `wordPhrase`s appear in the paste — not 15 unrelated targets
+- [x] 1.7 Local signed-in generate of a 3-word slash list (live key) yields cards whose `wordPhrase`s appear in the paste — not 15 unrelated targets — 231d89e
 
 ### Phase 2: Dashboard copy
 
