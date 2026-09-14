@@ -30,12 +30,12 @@ jobs:
       - name: Configure node
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version: "22"
           cache: npm
           cache-dependency-path: packages/code-reviewer/package-lock.json
 
       - name: Install reviewer
-        run: npm ci
+        run: npm install
         working-directory: packages/code-reviewer
 
       - name: Compute pull request diff
