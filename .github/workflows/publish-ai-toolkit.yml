@@ -32,9 +32,6 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@yelenkovsky"
 
-      - name: Copy registry npmrc into the package dir
-        run: cp "${{ github.workspace }}/.npmrc" .npmrc
-
       - run: npm ci
 
       - name: Validate package metadata and skill frontmatter
@@ -72,9 +69,6 @@ jobs:
           node-version: 22
           registry-url: https://npm.pkg.github.com
           scope: "@yelenkovsky"
-
-      - name: Copy registry npmrc into the package dir
-        run: cp "${{ github.workspace }}/.npmrc" .npmrc
 
       - run: npm ci
 
