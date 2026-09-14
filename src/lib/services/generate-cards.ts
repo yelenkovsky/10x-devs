@@ -5,9 +5,10 @@ import { z } from "zod";
 import { flashcardFieldsSchema, type FlashcardFields } from "@/lib/services/flashcard-fields";
 import { FLASHCARD_COLUMNS, flashcardRowSchema, toFlashcard } from "@/lib/services/flashcard-row";
 import { loadDecryptedOpenRouterApiKey } from "@/lib/services/openrouter-key";
+import { CARD_CAP, isGrounded, shapePaste, type PasteTargets } from "@/lib/services/paste-targets";
 import type { Flashcard, GenerateCardsResponse } from "@/types";
 
-export const CARD_CAP = 15;
+export { CARD_CAP };
 export const DEFAULT_OPENROUTER_MODEL = "openai/gpt-4o-mini";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const GENERATE_TIMEOUT_MS = 55_000;
@@ -24,7 +25,7 @@ Each card must include:
 - collocationPattern: the collocation or grammar pattern the sentence teaches
 - translationPl: a natural Polish translation of the full sentence
 
-One card per target item. If the input is a list, each list item is a target. If the input is prose, extract the useful target words or phrases. If there are more than 15 items, use the first 15 in input order. Return at most 15 cards.`;
+One card per listed line, in input order. Do not add extra cards. If the input is a list, each line is one target. If the input is prose, extract only target words or phrases that appear in this text. Return at most 15 cards.`;
 
 const cardsEnvelopeSchema = z.object({
   cards: z.array(z.unknown()),
@@ -42,47 +43,62 @@ const openRouterResponseSchema = z.object({
     .min(1),
 });
 
-const cardJsonSchema = {
+const cardItemJsonSchema = {
   type: "object",
   properties: {
-    cards: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          cloze: {
-            type: "string",
-            description: "English sentence with _____ in place of the target word or phrase",
-          },
-          wordPhrase: {
-            type: "string",
-            description: "The gapped word or phrase",
-          },
-          fullSentence: {
-            type: "string",
-            description: "The cloze sentence with the gap filled",
-          },
-          definition: {
-            type: "string",
-            description: "Short everyday English definition of the target",
-          },
-          collocationPattern: {
-            type: "string",
-            description: "Collocation or grammar pattern the sentence teaches",
-          },
-          translationPl: {
-            type: "string",
-            description: "Natural Polish translation of the full sentence",
-          },
-        },
-        required: ["cloze", "wordPhrase", "fullSentence", "definition", "collocationPattern", "translationPl"],
-        additionalProperties: false,
-      },
+    cloze: {
+      type: "string",
+      description: "English sentence with _____ in place of the target word or phrase",
+    },
+    wordPhrase: {
+      type: "string",
+      description: "The gapped word or phrase",
+    },
+    fullSentence: {
+      type: "string",
+      description: "The cloze sentence with the gap filled",
+    },
+    definition: {
+      type: "string",
+      description: "Short everyday English definition of the target",
+    },
+    collocationPattern: {
+      type: "string",
+      description: "Collocation or grammar pattern the sentence teaches",
+    },
+    translationPl: {
+      type: "string",
+      description: "Natural Polish translation of the full sentence",
     },
   },
-  required: ["cards"],
+  required: ["cloze", "wordPhrase", "fullSentence", "definition", "collocationPattern", "translationPl"],
   additionalProperties: false,
 };
+
+function cardJsonSchema(shaped: PasteTargets) {
+  const cards: {
+    type: "array";
+    items: typeof cardItemJsonSchema;
+    maxItems: number;
+    minItems?: number;
+  } = {
+    type: "array",
+    items: cardItemJsonSchema,
+    maxItems: CARD_CAP,
+  };
+
+  if (shaped.kind === "list") {
+    cards.minItems = shaped.cappedItemCount;
+    cards.maxItems = shaped.cappedItemCount;
+  }
+
+  return {
+    type: "object",
+    properties: { cards },
+    required: ["cards"],
+    additionalProperties: false,
+  };
+}
 
 export class GenerateCardsError extends Error {
   readonly status: number;
@@ -125,20 +141,20 @@ export async function generateCards(input: GenerateCardsInput): Promise<Generate
     throw unavailable();
   }
 
-  const content = await requestOpenRouterCards(input.paste, input.origin, apiKey);
+  const shaped = shapePaste(input.paste);
+  const content = await requestOpenRouterCards(shaped, input.origin, apiKey);
   const envelope = cardsEnvelopeSchema.safeParse(parseJsonContent(content));
   if (!envelope.success) {
     throw unavailable();
   }
 
-  const truncated = envelope.data.cards.length >= CARD_CAP;
   const candidates = envelope.data.cards.slice(0, CARD_CAP);
 
   const validCards: FlashcardFields[] = [];
   let failedCount = 0;
   for (const candidate of candidates) {
     const parsed = flashcardFieldsSchema.safeParse(candidate);
-    if (parsed.success) {
+    if (parsed.success && isGrounded(parsed.data.wordPhrase, shaped.haystack)) {
       validCards.push(parsed.data);
     } else {
       failedCount += 1;
@@ -146,10 +162,10 @@ export async function generateCards(input: GenerateCardsInput): Promise<Generate
   }
 
   const cards = await persistValidCards(input.supabase, input.userId, validCards);
-  return { cards, failedCount, truncated, cap: CARD_CAP };
+  return { cards, failedCount, truncated: shaped.truncated, cap: CARD_CAP };
 }
 
-async function requestOpenRouterCards(paste: string, origin: string, apiKey: string): Promise<string> {
+async function requestOpenRouterCards(shaped: PasteTargets, origin: string, apiKey: string): Promise<string> {
   const model = OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL;
   let response: Response;
 
@@ -167,14 +183,14 @@ async function requestOpenRouterCards(paste: string, origin: string, apiKey: str
         model,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: paste },
+          { role: "user", content: shaped.haystack },
         ],
         response_format: {
           type: "json_schema",
           json_schema: {
             name: "flashcards",
             strict: true,
-            schema: cardJsonSchema,
+            schema: cardJsonSchema(shaped),
           },
         },
         provider: { require_parameters: true },
