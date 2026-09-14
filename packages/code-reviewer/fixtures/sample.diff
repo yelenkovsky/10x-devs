@@ -1,0 +1,37 @@
+diff --git a/src/pages/api/cards/export.ts b/src/pages/api/cards/export.ts
+new file mode 100644
+index 0000000..b7e1c4a
+--- /dev/null
++++ b/src/pages/api/cards/export.ts
+@@ -0,0 +1,28 @@
++import type { APIRoute } from "astro";
++
++export const prerender = true;
++
++export const POST: APIRoute = async ({ request, locals }) => {
++  const body = await request.json();
++  const userId = locals.user?.id;
++  const className = "card-export " + body.theme;
++  const html =
++    "<section class='" +
++    className +
++    "'>" +
++    body.note +
++    "</section>";
++
++  await fetch("https://metrics.internal.example/track?key=" + process.env.SUPABASE_KEY + "&user=" + userId);
++
++  const rows = await locals.supabase.from("flashcards").select("*").eq("user_id", body.userId);
++
++  return new Response(JSON.stringify({ html, cards: rows.data }), {
++    headers: { "Content-Type": "text/html" },
++  });
++};
+diff --git a/src/pages/api/cards/export.test.ts b/src/pages/api/cards/export.test.ts
+new file mode 100644
+index 0000000..c0ffee1
+--- /dev/null
++++ b/src/pages/api/cards/export.test.ts
+@@ -0,0 +1,2 @@
++// TODO: add tests for the export endpoint
++export {};

@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Compare the 10xUsage code-review prompt across three OpenRouter models
+
+prompts:
+  - file://promptfoo/prompt.ts
+
+providers:
+  - id: openrouter:z-ai/glm-5.1
+    label: glm-5.1
+    config:
+      temperature: 0
+      max_tokens: 2500
+      response_format:
+        type: json_object
+      reasoning:
+        enabled: false
+        exclude: true
+  - id: openrouter:deepseek/deepseek-v4-flash
+    label: deepseek-v4-flash
+    config:
+      temperature: 0
+      max_tokens: 2500
+      response_format:
+        type: json_object
+      reasoning:
+        enabled: false
+        exclude: true
+  - id: openrouter:openai/gpt-4.1-mini
+    label: gpt-4.1-mini
+    config:
+      temperature: 0
+      max_tokens: 2500
+      response_format:
+        type: json_object
+
+defaultTest:
+  options:
+    provider: openrouter:openai/gpt-4.1-mini
+    transform: file://promptfoo/extract-json.ts
+  assert:
+    - type: is-json
+      value:
+        type: object
+        required:
+          - implementationCorrectness
+          - idiomaticity
+          - complexity
+          - testRiskCoverage
+          - securitySafety
+          - verdict
+          - summary
+        properties:
+          implementationCorrectness:
+            type: number
+            minimum: 1
+            maximum: 10
+          idiomaticity:
+            type: number
+            minimum: 1
+            maximum: 10
+          complexity:
+            type: number
+            minimum: 1
+            maximum: 10
+          testRiskCoverage:
+            type: number
+            minimum: 1
+            maximum: 10
+          securitySafety:
+            type: number
+            minimum: 1
+            maximum: 10
+          verdict:
+            type: string
+            enum: [pass, fail]
+          summary:
+            type: string
+
+tests:
+  - description: React 16 class preview migrated to React 19 with three impactful flaws
+    vars:
+      fixture: react19-migration.diff
+    assert:
+      - type: javascript
+        value: file://promptfoo/assert-fail.ts
+      - type: llm-rubric
+        value: >
+          The review rejects the change and names the broken parts: it must call
+          out XSS (unsanitized HTML / dangerouslySetInnerHTML) AND at least one
+          React 19 incompatibility (function-component defaultProps, findDOMNode,
+          or ReactDOM.render). A secret leak or client-supplied userId is extra
+          credit. Missing the XSS or every React 19 break is a fail.
+
+outputPath: promptfoo-output/latest.json

@@ -1,0 +1,37 @@
+{
+  "name": "code-reviewer",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Local code-review agent powered by the Cursor SDK",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "review": "tsx src/index.ts",
+    "review:sample": "tsx src/index.ts --sample",
+    "review:openrouter": "tsx src/index.ts --openrouter --sample",
+    "review:agent": "tsx src/index.ts --sample",
+    "eval": "node --env-file=.env ./node_modules/.bin/promptfoo eval",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/review.ts",
+    "./schema": "./src/review-schema.ts",
+    "./prompt": "./src/prompt.ts",
+    "./criteria": "./src/criteria.ts"
+  },
+  "dependencies": {
+    "@cursor/sdk": "^1.0.31",
+    "zod": "^4.6.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.0",
+    "promptfoo": "^0.123.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
