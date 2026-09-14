@@ -40,3 +40,13 @@ export function requireCursorApiKey(): string {
   }
   return apiKey;
 }
+
+export function requireOpenRouterApiKey(): string {
+  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
+  if (!apiKey) {
+    throw new Error(
+      "OPENROUTER_API_KEY is missing. Copy packages/code-reviewer/.env.example to .env or set the GitHub Actions secret.",
+    );
+  }
+  return apiKey;
+}

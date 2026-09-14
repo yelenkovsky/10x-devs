@@ -1,0 +1,69 @@
+name: AI Reviewer
+description: Run the team's code review agent and post a PR comment
+
+branding:
+  icon: terminal
+  color: purple
+
+inputs:
+  api-key:
+    description: OpenRouter API key
+    required: true
+  github-token:
+    description: Token used to comment and label the pull request
+    required: true
+  diff-path:
+    description: Path to a unified diff file
+    required: true
+  pr-number:
+    description: Pull request number
+    required: true
+  pr-title:
+    description: Pull request title
+    required: false
+    default: ""
+  pr-body:
+    description: Pull request description
+    required: false
+    default: ""
+
+outputs:
+  verdict:
+    description: Pass/fail verdict from the agent
+    value: ${{ steps.agent.outputs.verdict }}
+
+runs:
+  using: composite
+  steps:
+    - name: Run agent
+      id: agent
+      shell: bash
+      working-directory: ${{ github.workspace }}/packages/code-reviewer
+      env:
+        OPENROUTER_API_KEY: ${{ inputs.api-key }}
+        REVIEW_PROVIDER: openrouter
+        REVIEW_COMMENT_PATH: ${{ runner.temp }}/ai-review-comment.md
+        PR_TITLE: ${{ inputs.pr-title }}
+        PR_BODY: ${{ inputs.pr-body }}
+      run: npx tsx src/index.ts < "${{ inputs.diff-path }}"
+
+    - name: Comment and label
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+        VERDICT: ${{ steps.agent.outputs.verdict }}
+        COMMENT_PATH: ${{ runner.temp }}/ai-review-comment.md
+      run: |
+        set -euo pipefail
+        gh pr comment "$PR_NUMBER" --body-file "$COMMENT_PATH"
+        gh label create "ai-cr:passed" --color "16A34A" --description "AI code review passed" --force >/dev/null
+        gh label create "ai-cr:failed" --color "DC2626" --description "AI code review failed" --force >/dev/null
+        gh label create "ai-cr:review" --color "7C3AED" --description "Re-run AI code review" --force >/dev/null
+        gh pr edit "$PR_NUMBER" --remove-label "ai-cr:passed" --remove-label "ai-cr:failed" || true
+        if [ "$VERDICT" = "pass" ]; then
+          gh pr edit "$PR_NUMBER" --add-label "ai-cr:passed"
+        else
+          gh pr edit "$PR_NUMBER" --add-label "ai-cr:failed"
+        fi
+        gh pr edit "$PR_NUMBER" --remove-label "ai-cr:review" || true

@@ -50,3 +50,5 @@ The same prompt is scored on three OpenRouter models against `fixtures/react19-m
 ```bash
 npm run eval
 ```
+
+CI uses the same prompt via OpenRouter (`REVIEW_PROVIDER=openrouter`) from `.github/workflows/review.yml`. Every pull request to `main` gets a summary comment and an `ai-cr:passed` or `ai-cr:failed` label. Add `ai-cr:review` to retry.
