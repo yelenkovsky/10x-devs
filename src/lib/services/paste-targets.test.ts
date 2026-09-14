@@ -46,6 +46,14 @@ describe("shapePaste", () => {
     expect(shaped.haystack).toBe(paste);
   });
 
+  it("does not split on a mid-string bullet glyph", () => {
+    const paste = "apple•banana";
+    const shaped = shapePaste(paste);
+    expect(shaped.kind).toBe("prose");
+    expect(shaped.truncated).toBe(false);
+    expect(shaped.haystack).toBe(paste);
+  });
+
   it("caps a 20-item list at CARD_CAP and sets truncated", () => {
     const items = Array.from({ length: 20 }, (_, index) => `word${index + 1}`);
     const shaped = shapePaste(items.join("\n"));

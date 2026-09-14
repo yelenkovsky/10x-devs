@@ -42,7 +42,7 @@ function splitPasteItems(paste: string): string[] {
 
   for (const line of paste.split(/\r?\n/)) {
     const withoutLeadingBullet = line.replace(/^\s*[-*•]\s+/, "");
-    for (const slashPart of withoutLeadingBullet.split(/[/•]/)) {
+    for (const slashPart of withoutLeadingBullet.split("/")) {
       const chunks = allowCommaSplit ? slashPart.split(",") : [slashPart];
       for (const chunk of chunks) {
         const trimmed = chunk.replace(/^\s*[-*•]\s+/, "").trim();

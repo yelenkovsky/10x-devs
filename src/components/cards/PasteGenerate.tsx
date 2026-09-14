@@ -53,6 +53,7 @@ interface BatchNotes {
   failedCount: number;
   truncated: boolean;
   cap: number;
+  savedCount: number;
 }
 
 export default function PasteGenerate({
@@ -128,6 +129,7 @@ export default function PasteGenerate({
         failedCount: parsed.data.failedCount,
         truncated: parsed.data.truncated,
         cap: parsed.data.cap,
+        savedCount: parsed.data.cards.length,
       });
     } catch {
       setError(GENERIC_GENERATE_ERROR);
@@ -138,7 +140,7 @@ export default function PasteGenerate({
   }
 
   const pasteError = emptyState || error === PASTE_TOO_LONG_MESSAGE;
-  const unmatchedPaste = cards.length === 0 && (batchNotes?.failedCount ?? 0) > 0;
+  const unmatchedPaste = (batchNotes?.savedCount ?? 0) === 0 && (batchNotes?.failedCount ?? 0) > 0;
 
   return (
     <div className="space-y-6">

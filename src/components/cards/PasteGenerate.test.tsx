@@ -266,4 +266,29 @@ describe("PasteGenerate batch notes", () => {
     expect(screen.queryByRole("alert")).toBeNull();
     expect(screen.queryByText(TRUNCATION_BANNER)).toBeNull();
   });
+
+  it("shows unmatched-paste status on a nonempty deck when this batch saved nothing", async () => {
+    stubGenerateFetch(() =>
+      Promise.resolve(
+        jsonOkResponse({
+          cards: [],
+          failedCount: 15,
+          truncated: false,
+          cap: 15,
+        }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<PasteGenerate initialCards={[INITIAL_CARD]} configured />);
+    await user.type(screen.getByLabelText(/paste a word list or short text/i), "apple / banana / run");
+    await user.click(screen.getByRole("button", { name: /^generate$/i }));
+
+    const unmatched = await screen.findByText(UNMATCHED_PASTE_MESSAGE);
+    expect(unmatched.getAttribute("role")).toBe("status");
+    expect(screen.queryByText(/could not be saved/i)).toBeNull();
+    expect(screen.queryByText(EMPTY_DECK_COPY)).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    assertInitialCardsUnchanged();
+  });
 });

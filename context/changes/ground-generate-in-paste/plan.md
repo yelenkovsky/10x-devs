@@ -221,27 +221,27 @@ No schema change. No paste backfill. Existing `generated` rows that were ungroun
 
 #### Automated
 
-- [x] 1.1 `src/lib/services/paste-targets.test.ts` covers list vs prose, cap, truncated, and grounding cases above — 231d89e
-- [x] 1.2 `generate-cards` tests persist only grounded cards and set `truncated` from input cut, including the 3-item + 15-envelope case — 231d89e
-- [x] 1.3 `npm test` exits 0 — 231d89e
-- [x] 1.4 `npm run lint` succeeds — 231d89e
-- [x] 1.5 `npx astro sync` succeeds — 231d89e
-- [x] 1.6 `npm run build` succeeds — 231d89e
+- [x] 1.1 `src/lib/services/paste-targets.test.ts` covers list vs prose, cap, truncated, and grounding cases above — 650b0d1
+- [x] 1.2 `generate-cards` tests persist only grounded cards and set `truncated` from input cut, including the 3-item + 15-envelope case — 650b0d1
+- [x] 1.3 `npm test` exits 0 — 650b0d1
+- [x] 1.4 `npm run lint` succeeds — 650b0d1
+- [x] 1.5 `npx astro sync` succeeds — 650b0d1
+- [x] 1.6 `npm run build` succeeds — 650b0d1
 
 #### Manual
 
-- [x] 1.7 Local signed-in generate of a 3-word slash list (live key) yields cards whose `wordPhrase`s appear in the paste — not 15 unrelated targets — 231d89e
+- [x] 1.7 Local signed-in generate of a 3-word slash list (live key) yields cards whose `wordPhrase`s appear in the paste — not 15 unrelated targets — 650b0d1
 
 ### Phase 2: Dashboard copy
 
 #### Automated
 
-- [x] 2.1 PasteGenerate tests cover truncation banner on/off and unmatched-paste 200 — 7928bbc
-- [x] 2.2 Helper copy no longer always claims the first 15 items are used — 7928bbc
-- [x] 2.3 `npm test` exits 0 — 7928bbc
-- [x] 2.4 `npm run lint` succeeds — 7928bbc
-- [x] 2.5 `npx astro sync` succeeds — 7928bbc
-- [x] 2.6 `npm run build` succeeds — 7928bbc
+- [x] 2.1 PasteGenerate tests cover truncation banner on/off and unmatched-paste 200 — e760886
+- [x] 2.2 Helper copy no longer always claims the first 15 items are used — e760886
+- [x] 2.3 `npm test` exits 0 — e760886
+- [x] 2.4 `npm run lint` succeeds — e760886
+- [x] 2.5 `npx astro sync` succeeds — e760886
+- [x] 2.6 `npm run build` succeeds — e760886
 
 #### Manual
 

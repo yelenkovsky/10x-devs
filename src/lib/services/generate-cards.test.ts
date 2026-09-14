@@ -185,11 +185,31 @@ function cardWithPhrase(wordPhrase: string) {
 
 function openRouterRequestBody(init?: RequestInit): {
   messages: { role: string; content: string }[];
+  response_format?: {
+    json_schema?: {
+      schema?: {
+        properties?: {
+          cards?: { minItems?: number; maxItems?: number };
+        };
+      };
+    };
+  };
 } {
   if (!init || typeof init.body !== "string") {
     throw new Error("expected OpenRouter JSON body");
   }
-  return JSON.parse(init.body) as { messages: { role: string; content: string }[] };
+  return JSON.parse(init.body) as {
+    messages: { role: string; content: string }[];
+    response_format?: {
+      json_schema?: {
+        schema?: {
+          properties?: {
+            cards?: { minItems?: number; maxItems?: number };
+          };
+        };
+      };
+    };
+  };
 }
 
 describe("generateCards paste grounding", () => {
@@ -263,5 +283,44 @@ describe("generateCards paste grounding", () => {
     expect(body.messages[1]?.content).toBe(items.slice(0, 15).join("\n"));
     expect(result.truncated).toBe(true);
     expect(result.cards).toHaveLength(15);
+  });
+
+  it("pins list schema minItems and maxItems to the capped item count", async () => {
+    const openRouterFetch = stubOpenRouterFetch(() =>
+      Promise.resolve(openRouterSuccess(["apple", "banana", "run"].map(cardWithPhrase))),
+    );
+
+    await generateCards({
+      userId: USER_A,
+      paste: "apple / banana / run",
+      origin: ORIGIN,
+      supabase: store.clientFor(USER_A),
+    });
+
+    expect(openRouterFetch).toHaveBeenCalledOnce();
+    const cards = openRouterRequestBody(openRouterFetch.mock.calls[0]?.[1]).response_format?.json_schema?.schema
+      ?.properties?.cards;
+    expect(cards?.minItems).toBe(3);
+    expect(cards?.maxItems).toBe(3);
+  });
+
+  it("maps OpenRouter 400 to generation_unavailable without retrying", async () => {
+    const openRouterFetch = stubOpenRouterFetch(() => Promise.resolve(new Response("bad schema", { status: 400 })));
+
+    await expect(
+      generateCards({
+        userId: USER_A,
+        paste: "apple / banana / run",
+        origin: ORIGIN,
+        supabase: store.clientFor(USER_A),
+      }),
+    ).rejects.toMatchObject({
+      name: "GenerateCardsError",
+      code: "generation_unavailable",
+      status: 503,
+    });
+
+    expect(openRouterFetch).toHaveBeenCalledOnce();
+    expect(store.flashcards).toHaveLength(0);
   });
 });
