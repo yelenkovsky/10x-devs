@@ -44,11 +44,18 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           git fetch origin "$BASE_REF" --depth=50
-          git diff "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/pr.diff"
+          git diff "origin/${BASE_REF}...HEAD" -- . \
+            ":(exclude)packages/code-reviewer/fixtures/**" \
+            ":(exclude)**/package-lock.json" \
+            > "$RUNNER_TEMP/pr.diff"
 
       - name: Compute working-tree diff
         if: github.event_name != 'pull_request'
-        run: git diff origin/main...HEAD > "$RUNNER_TEMP/pr.diff"
+        run: |
+          git diff origin/main...HEAD -- . \
+            ":(exclude)packages/code-reviewer/fixtures/**" \
+            ":(exclude)**/package-lock.json" \
+            > "$RUNNER_TEMP/pr.diff"
 
       - name: Run agent
         if: github.event_name == 'pull_request'

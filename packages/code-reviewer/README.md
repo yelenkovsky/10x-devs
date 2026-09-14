@@ -52,3 +52,5 @@ npm run eval
 ```
 
 CI uses the same prompt via OpenRouter (`REVIEW_PROVIDER=openrouter`) from `.github/workflows/review.yml`. Every pull request to `main` gets a summary comment and an `ai-cr:passed` or `ai-cr:failed` label. Add `ai-cr:review` to retry.
+
+Known-bad files under `fixtures/` are the eval corpus. CI and `git diff | npx tsx src/index.ts` drop those hunks (and lockfiles) before scoring so a reviewer PR is not failed for shipping the sample. `--sample` and `npm run eval` still score the corpus as-is.

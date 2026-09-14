@@ -56,7 +56,18 @@ runs:
         COMMENT_PATH: ${{ runner.temp }}/ai-review-comment.md
       run: |
         set -euo pipefail
-        gh pr comment "$PR_NUMBER" --body-file "$COMMENT_PATH"
+        repo="${GITHUB_REPOSITORY:?}"
+        comment_id="$(
+          gh api "repos/${repo}/issues/${PR_NUMBER}/comments" --paginate \
+            --jq '.[] | select(.user.login=="github-actions[bot]" and (.body | test("^## AI code review"))) | .id' \
+            | tail -n1
+        )"
+        payload="$(jq -n --rawfile body "$COMMENT_PATH" '{body: $body}')"
+        if [ -n "$comment_id" ]; then
+          printf '%s' "$payload" | gh api --method PATCH "repos/${repo}/issues/comments/${comment_id}" --input - >/dev/null
+        else
+          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_PATH"
+        fi
         gh label create "ai-cr:passed" --color "16A34A" --description "AI code review passed" --force >/dev/null
         gh label create "ai-cr:failed" --color "DC2626" --description "AI code review failed" --force >/dev/null
         gh label create "ai-cr:review" --color "7C3AED" --description "Re-run AI code review" --force >/dev/null
