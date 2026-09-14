@@ -14,6 +14,7 @@ const PASTE_TOO_LONG_MESSAGE = "Paste is too long. Use 4000 characters or fewer.
 const GENERIC_GENERATE_ERROR = "Generation is temporarily unavailable. Try again.";
 const LOAD_ERROR_MESSAGE = "Cards could not be loaded. Refresh to try again.";
 const KEY_LOAD_ERROR_MESSAGE = "Could not load your OpenRouter key status. Refresh to try again.";
+const UNMATCHED_PASTE_MESSAGE = "None of the cards matched this paste.";
 
 const flashcardSchema = z.object({
   id: z.string(),
@@ -137,6 +138,7 @@ export default function PasteGenerate({
   }
 
   const pasteError = emptyState || error === PASTE_TOO_LONG_MESSAGE;
+  const unmatchedPaste = cards.length === 0 && (batchNotes?.failedCount ?? 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -172,7 +174,7 @@ export default function PasteGenerate({
             )}
           />
           <p className="mt-1 text-xs text-blue-100/50">
-            {paste.length}/{MAX_PASTE_LENGTH} characters. The first 15 items are used.
+            {paste.length}/{MAX_PASTE_LENGTH} characters.
           </p>
         </div>
 
@@ -261,9 +263,15 @@ export default function PasteGenerate({
         }}
       />
 
-      {batchNotes?.failedCount ? (
+      {batchNotes?.failedCount && !unmatchedPaste ? (
         <p className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80" role="status">
           {batchNotes.failedCount} {batchNotes.failedCount === 1 ? "card" : "cards"} from this batch could not be saved.
+        </p>
+      ) : null}
+
+      {unmatchedPaste ? (
+        <p className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-blue-100/80" role="status">
+          {UNMATCHED_PASTE_MESSAGE}
         </p>
       ) : null}
 
@@ -283,7 +291,7 @@ export default function PasteGenerate({
         </p>
       ) : null}
 
-      {!loadError && cards.length === 0 && !isGenerating ? (
+      {!loadError && cards.length === 0 && !isGenerating && !unmatchedPaste ? (
         <p
           className="rounded-2xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-blue-100/60"
           role="status"

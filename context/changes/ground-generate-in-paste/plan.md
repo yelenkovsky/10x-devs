@@ -236,12 +236,12 @@ No schema change. No paste backfill. Existing `generated` rows that were ungroun
 
 #### Automated
 
-- [ ] 2.1 PasteGenerate tests cover truncation banner on/off and unmatched-paste 200
-- [ ] 2.2 Helper copy no longer always claims the first 15 items are used
-- [ ] 2.3 `npm test` exits 0
-- [ ] 2.4 `npm run lint` succeeds
-- [ ] 2.5 `npx astro sync` succeeds
-- [ ] 2.6 `npm run build` succeeds
+- [x] 2.1 PasteGenerate tests cover truncation banner on/off and unmatched-paste 200
+- [x] 2.2 Helper copy no longer always claims the first 15 items are used
+- [x] 2.3 `npm test` exits 0
+- [x] 2.4 `npm run lint` succeeds
+- [x] 2.5 `npx astro sync` succeeds
+- [x] 2.6 `npm run build` succeeds
 
 #### Manual
 
