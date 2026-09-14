@@ -1,0 +1,93 @@
+name: Publish AI Toolkit
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "packages/ai-toolkit/**"
+      - ".github/workflows/publish-ai-toolkit.yml"
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "packages/ai-toolkit/**"
+      - ".github/workflows/publish-ai-toolkit.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+defaults:
+  run:
+    working-directory: packages/ai-toolkit
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: "@yelenkovsky"
+
+      - name: Copy registry npmrc into the package dir
+        run: cp "${{ github.workspace }}/.npmrc" .npmrc
+
+      - run: npm ci
+
+      - name: Validate package metadata and skill frontmatter
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            if (pkg.name !== "@yelenkovsky/ai-toolkit") throw new Error("bad name");
+            if (!pkg.version) throw new Error("missing version");
+            if (pkg.publishConfig?.registry !== "https://npm.pkg.github.com") {
+              throw new Error("missing publishConfig.registry");
+            }
+            const skill = fs.readFileSync("skills/code-review/SKILL.md", "utf8");
+            const match = skill.match(/^---\n([\s\S]*?)\n---/);
+            if (!match) throw new Error("missing SKILL.md frontmatter");
+            if (!/^name:\s*code-review\s*$/m.test(match[1])) {
+              throw new Error("frontmatter name must be code-review");
+            }
+            if (!/^description:\s*.+/m.test(match[1])) {
+              throw new Error("frontmatter description required");
+            }
+          '
+
+      - run: npm pack --dry-run
+
+  publish:
+    needs: validate
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: "@yelenkovsky"
+
+      - name: Copy registry npmrc into the package dir
+        run: cp "${{ github.workspace }}/.npmrc" .npmrc
+
+      - run: npm ci
+
+      - name: Publish if version is new
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          NAME="$(node -p "require('./package.json').name")"
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
+            echo "Already published ${NAME}@${VERSION}; skipping"
+          else
+            echo "Publishing ${NAME}@${VERSION}"
+            npm publish --access public
+          fi
