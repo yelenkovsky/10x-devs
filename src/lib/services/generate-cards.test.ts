@@ -173,3 +173,95 @@ describe("generateCards user key", () => {
     expect(result.cards[0]?.wordPhrase).toBe(CARD.wordPhrase);
   });
 });
+
+function cardWithPhrase(wordPhrase: string) {
+  return {
+    ...CARD,
+    cloze: `They _____ ${wordPhrase}.`,
+    wordPhrase,
+    fullSentence: `They ${wordPhrase}.`,
+  };
+}
+
+function openRouterRequestBody(init?: RequestInit): {
+  messages: { role: string; content: string }[];
+} {
+  if (!init || typeof init.body !== "string") {
+    throw new Error("expected OpenRouter JSON body");
+  }
+  return JSON.parse(init.body) as { messages: { role: string; content: string }[] };
+}
+
+describe("generateCards paste grounding", () => {
+  const store = createUserOpenRouterKeyStore();
+
+  beforeEach(async () => {
+    store.rows.clear();
+    store.flashcards.length = 0;
+    await saveOpenRouterKey({
+      userId: USER_A,
+      apiKey: KEY_A,
+      wrappingKey: VALID_HEX,
+      supabase: store.clientFor(USER_A),
+    });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("persists only grounded cards from a 15-card envelope for a 3-item paste", async () => {
+    const grounded = ["apple", "banana", "run"].map(cardWithPhrase);
+    const ungrounded = Array.from({ length: 12 }, (_, index) => cardWithPhrase(`unrelated${index + 1}`));
+    stubOpenRouterFetch(() => Promise.resolve(openRouterSuccess([...grounded, ...ungrounded])));
+
+    const result = await generateCards({
+      userId: USER_A,
+      paste: "apple / banana / run",
+      origin: ORIGIN,
+      supabase: store.clientFor(USER_A),
+    });
+
+    expect(result.cards.map((card) => card.wordPhrase)).toEqual(["apple", "banana", "run"]);
+    expect(result.truncated).toBe(false);
+    expect(result.failedCount).toBe(12);
+    expect(store.flashcards).toHaveLength(3);
+  });
+
+  it("persists nothing when a short paste yields 15 ungrounded cards", async () => {
+    const ungrounded = Array.from({ length: 15 }, (_, index) => cardWithPhrase(`unrelated${index + 1}`));
+    stubOpenRouterFetch(() => Promise.resolve(openRouterSuccess(ungrounded)));
+
+    const result = await generateCards({
+      userId: USER_A,
+      paste: "apple / banana / run",
+      origin: ORIGIN,
+      supabase: store.clientFor(USER_A),
+    });
+
+    expect(result.cards).toHaveLength(0);
+    expect(result.truncated).toBe(false);
+    expect(result.failedCount).toBe(15);
+    expect(store.flashcards).toHaveLength(0);
+  });
+
+  it("sends the first 15 list lines and reports truncated for a 20-item paste", async () => {
+    const items = Array.from({ length: 20 }, (_, index) => `word${index + 1}`);
+    const openRouterFetch = stubOpenRouterFetch(() =>
+      Promise.resolve(openRouterSuccess(items.slice(0, 15).map(cardWithPhrase))),
+    );
+
+    const result = await generateCards({
+      userId: USER_A,
+      paste: items.join("\n"),
+      origin: ORIGIN,
+      supabase: store.clientFor(USER_A),
+    });
+
+    expect(openRouterFetch).toHaveBeenCalledOnce();
+    const body = openRouterRequestBody(openRouterFetch.mock.calls[0]?.[1]);
+    expect(body.messages[1]?.content).toBe(items.slice(0, 15).join("\n"));
+    expect(result.truncated).toBe(true);
+    expect(result.cards).toHaveLength(15);
+  });
+});

@@ -70,10 +70,7 @@ export function toOpenRouterKeyStatus(row: UserOpenRouterKeyHintRow | null | und
   return { configured: true, last4: row.last4 };
 }
 
-export async function loadOpenRouterKeyHint(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<OpenRouterKeyStatus> {
+export async function loadOpenRouterKeyHint(supabase: SupabaseClient, userId: string): Promise<OpenRouterKeyStatus> {
   const { data, error } = await supabase
     .from("user_openrouter_keys")
     .select(USER_OPENROUTER_KEY_HINT_COLUMNS)
