@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "astro build && wrangler deploy",
+    "review:agent": "npm run review:sample --prefix packages/code-reviewer"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.8",

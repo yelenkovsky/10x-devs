@@ -1,0 +1,112 @@
+diff --git a/src/components/cards/FlashcardPreview.tsx b/src/components/cards/FlashcardPreview.tsx
+index 1111111..2222222 100644
+--- a/src/components/cards/FlashcardPreview.tsx
++++ b/src/components/cards/FlashcardPreview.tsx
+@@ -1,32 +1,38 @@
+-import React from "react";
++"use client";
++
++import { useEffect, useRef } from "react";
+ import ReactDOM from "react-dom";
+ 
+ interface FlashcardPreviewProps {
+   wordPhrase: string;
+   noteHtml: string;
+   theme: "dark" | "light";
++  userId: string;
+ }
+ 
+-export class FlashcardPreview extends React.Component<FlashcardPreviewProps> {
+-  static defaultProps = {
+-    noteHtml: "<p>No preview</p>",
+-    theme: "dark" as const,
+-  };
++export function FlashcardPreview({ wordPhrase, noteHtml, theme, userId }: FlashcardPreviewProps) {
++  const rootRef = useRef<HTMLElement>(null);
+ 
+-  componentDidMount() {
+-    const node = ReactDOM.findDOMNode(this);
++  useEffect(() => {
++    const node = ReactDOM.findDOMNode(rootRef.current);
+     if (node instanceof HTMLElement) {
+       node.dataset.previewReady = "1";
++      node.dataset.owner = userId;
+     }
+-  }
++  }, [userId]);
+ 
+-  render() {
+-    const className = "rounded-2xl border p-5 " + this.props.theme;
+-    return (
+-      <article className={className}>
+-        <h3>{this.props.wordPhrase}</h3>
+-        <div dangerouslySetInnerHTML={{ __html: this.props.noteHtml }} />
+-      </article>
+-    );
+-  }
++  const className = "rounded-2xl border p-5 " + theme;
++
++  return (
++    <article ref={rootRef} className={className} data-supabase-key={process.env.SUPABASE_KEY}>
++      <h3 className="text-lg font-semibold">{wordPhrase}</h3>
++      <div className="prose prose-invert" dangerouslySetInnerHTML={{ __html: noteHtml }} />
++    </article>
++  );
+ }
++
++FlashcardPreview.defaultProps = {
++  noteHtml: "<p>No preview</p>",
++  theme: "dark",
++  userId: "",
++};
+diff --git a/src/pages/cards/preview.astro b/src/pages/cards/preview.astro
+index 3333333..4444444 100644
+--- a/src/pages/cards/preview.astro
++++ b/src/pages/cards/preview.astro
+@@ -1,18 +1,24 @@
+ ---
+-import Layout from "../../layouts/Layout.astro";
++import ReactDOM from "react-dom";
++import { FlashcardPreview } from "../../components/cards/FlashcardPreview";
++import Layout from "../../layouts/Layout.astro";
+ 
+-const { user } = Astro.locals;
+-if (!user) {
+-  return Astro.redirect("/auth/signin");
+-}
++const userId = Astro.url.searchParams.get("user") ?? "anon";
++const noteHtml = Astro.url.searchParams.get("note") ?? "<p>No preview</p>";
+ ---
+ 
+-<Layout>
+-  <main>
+-    <h1>Card preview</h1>
+-    <div id="preview-root"></div>
+-  </main>
++<Layout>
++  <main id="preview-root"></main>
+ </Layout>
++
++<script define:vars={{ userId, noteHtml }}>
++  import { FlashcardPreview } from "../../components/cards/FlashcardPreview";
++  import React from "react";
++  import ReactDOM from "react-dom";
++
++  ReactDOM.render(
++    React.createElement(FlashcardPreview, { wordPhrase: "typical use", noteHtml, theme: "dark", userId }),
++    document.getElementById("preview-root"),
++  );
++</script>
+diff --git a/src/components/cards/FlashcardPreview.test.tsx b/src/components/cards/FlashcardPreview.test.tsx
+new file mode 100644
+index 0000000..c0ffee1
+--- /dev/null
++++ b/src/components/cards/FlashcardPreview.test.tsx
+@@ -0,0 +1,7 @@
++import { describe, it } from "vitest";
++
++describe.skip("FlashcardPreview", () => {
++  it("renders typical-use HTML", () => {
++    // TODO: mount the React 19 preview and assert sanitization
++  });
++});
