@@ -49,6 +49,28 @@ function jsonErrorResponse(status: number, body: { error: string; code: string }
   });
 }
 
+function jsonOkResponse(body: { cards: Flashcard[]; failedCount: number; truncated: boolean; cap: number }): Response {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+const GENERATED_CARD: Flashcard = {
+  ...INITIAL_CARD,
+  id: "card-generated",
+  generationId: "gen-generated",
+  wordPhrase: "apple",
+  cloze: "An _____ a day.",
+  fullSentence: "An apple a day.",
+};
+
+const TRUNCATION_BANNER = "Using the first 15 items from this paste.";
+const HELPER_CUT_CLAIM = "The first 15 items are used.";
+const UNMATCHED_PASTE_MESSAGE = "None of the cards matched this paste.";
+const EMPTY_DECK_COPY =
+  "No cards yet. Generate from a paste above or create a card by hand. They stay on this account after refresh.";
+
 function assertInitialCardsUnchanged(): void {
   expect(screen.getAllByRole("heading", { name: INITIAL_CARD.wordPhrase })).toHaveLength(1);
   expect(screen.getAllByRole("article")).toHaveLength(1);
@@ -159,5 +181,89 @@ describe("PasteGenerate progress visibility", () => {
     fireEvent.submit(form);
 
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("PasteGenerate batch notes", () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
+  it("keeps helper copy from claiming the first 15 items are always used", () => {
+    render(<PasteGenerate initialCards={[]} configured />);
+
+    expect(screen.queryByText(HELPER_CUT_CLAIM)).toBeNull();
+    expect(screen.getByText("0/4000 characters.")).toBeTruthy();
+  });
+
+  it("does not show the truncation banner when truncated is false", async () => {
+    stubGenerateFetch(() =>
+      Promise.resolve(
+        jsonOkResponse({
+          cards: [GENERATED_CARD],
+          failedCount: 0,
+          truncated: false,
+          cap: 15,
+        }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<PasteGenerate initialCards={[]} configured />);
+    await user.type(screen.getByLabelText(/paste a word list or short text/i), "apple / banana / run");
+    await user.click(screen.getByRole("button", { name: /^generate$/i }));
+
+    expect(await screen.findByRole("heading", { name: GENERATED_CARD.wordPhrase })).toBeTruthy();
+    expect(screen.queryByText(TRUNCATION_BANNER)).toBeNull();
+    expect(screen.queryByText(HELPER_CUT_CLAIM)).toBeNull();
+  });
+
+  it("shows the truncation banner when truncated is true", async () => {
+    stubGenerateFetch(() =>
+      Promise.resolve(
+        jsonOkResponse({
+          cards: [GENERATED_CARD],
+          failedCount: 0,
+          truncated: true,
+          cap: 15,
+        }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<PasteGenerate initialCards={[]} configured />);
+    await user.type(screen.getByLabelText(/paste a word list or short text/i), "apple / banana / run");
+    await user.click(screen.getByRole("button", { name: /^generate$/i }));
+
+    expect(await screen.findByText(TRUNCATION_BANNER)).toBeTruthy();
+    expect(screen.getByText(TRUNCATION_BANNER).getAttribute("role")).toBe("status");
+  });
+
+  it("shows unmatched-paste status on empty 200 with failedCount, not empty-deck or a 503 alert", async () => {
+    stubGenerateFetch(() =>
+      Promise.resolve(
+        jsonOkResponse({
+          cards: [],
+          failedCount: 15,
+          truncated: false,
+          cap: 15,
+        }),
+      ),
+    );
+
+    const user = userEvent.setup();
+    render(<PasteGenerate initialCards={[]} configured />);
+    expect(screen.getByText(EMPTY_DECK_COPY)).toBeTruthy();
+
+    await user.type(screen.getByLabelText(/paste a word list or short text/i), "apple / banana / run");
+    await user.click(screen.getByRole("button", { name: /^generate$/i }));
+
+    const unmatched = await screen.findByText(UNMATCHED_PASTE_MESSAGE);
+    expect(unmatched.getAttribute("role")).toBe("status");
+    expect(screen.queryByText(EMPTY_DECK_COPY)).toBeNull();
+    expect(screen.queryByText(/could not be saved/i)).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByText(TRUNCATION_BANNER)).toBeNull();
   });
 });
