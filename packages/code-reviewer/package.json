@@ -10,6 +10,7 @@
   "scripts": {
     "review": "tsx src/index.ts",
     "review:sample": "tsx src/index.ts --sample",
+    "review:openrouter": "tsx src/index.ts --openrouter --sample",
     "review:agent": "tsx src/index.ts --sample",
     "eval": "node --env-file=.env ./node_modules/.bin/promptfoo eval",
     "typecheck": "tsc --noEmit"

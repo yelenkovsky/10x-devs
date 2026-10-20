@@ -64,4 +64,10 @@ export const VERDICT_RULES = `Score each criterion from 1 to 10 (integers prefer
 - **fail** if any score is ≤ 4, if securitySafety is ≤ 5, or if the diff introduces XSS, secret leakage, broken authz, or a React 19-incompatible API used as if it still worked.
 - **pass** only when the change is safe to merge against these criteria.
 
+Grounding (do not skip):
+- Score only this diff. Do not invent files, and do not cite paths that are not in the diff.
+- The 1–10 examples in the criteria (prerender true, lowercase handlers, findDOMNode, dangerouslySetInnerHTML, client userId) are illustrations. Report them only when those exact issues appear in the diff.
+- Judge the blast radius of THIS change. A reviewer, prompt, or CI-only PR is not a fail for lacking flashcard vitest coverage.
+- Files under packages/code-reviewer/fixtures/ are known-bad evaluation corpus, not production app code. Ignore them for the merge verdict.
+
 Include a Markdown summary (2–3 sentences) the PR author can act on. Mention file paths and the concrete defect, not generalities.`;
